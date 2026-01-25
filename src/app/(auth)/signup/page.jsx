@@ -39,7 +39,7 @@ export default function SignUp() {
         },
       });
       if (error) throw error;
-      router.push("/auth/sign-up-success");
+      router.push("/sign-up-success");
     } catch (error) {
       setError(error ? error.message : "An error occurred");
     } finally {
