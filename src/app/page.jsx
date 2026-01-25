@@ -36,7 +36,7 @@ export default function Home() {
     >
       <main className="min-h-screen flex flex-col bg-(--background)">
         <section className="mt-24 flex flex-col items-center justify-center px-6 text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold p-2 text-blue-500">
+          <h1 className="text-2xl sm:text-5xl font-bold p-2 text-blue-500">
             <TextType
               text={["Lineless", "Queues, Without the Queue", "No Lines. No Chaos."]}
               typingSpeed={75}

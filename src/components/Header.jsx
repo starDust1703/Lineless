@@ -1,12 +1,19 @@
 "use client";
 import Link from "next/link";
 import { ThemeSwitcher } from "./theme-switcher";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Header() {
+  const router = useRouter();
+  const pathname = usePathname();
   const scrollToFeatures = () => {
-    const el = document.getElementById("features");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
+
+    if (pathname !== "/") {
+      router.push("/#features");
+    } else {
+      document
+        .getElementById("features")
+        ?.scrollIntoView({ behavior: "smooth" });
     }
   };
 

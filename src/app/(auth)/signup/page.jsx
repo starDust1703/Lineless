@@ -55,7 +55,7 @@ export default function SignUp() {
       sparkCount={8}
       duration={400}
     >
-      <div className="flex p-4 justify-center">
+      <div className="flex min-h-svh w-full bg items-center justify-center p-6 md:p-10">
         <div className={cn("flex flex-col w-80 gap-6")}>
           <Card>
             <CardHeader>
@@ -103,7 +103,7 @@ export default function SignUp() {
                     />
                   </div>
                   {error && <p className="text-sm text-red-500">{error}</p>}
-                  <button className="px-4 py-2 rounded-md bg-black text-white text-sm hover:opacity-80 transition" type="submit" disabled={isLoading}>
+                  <button type="submit" className="px-4 py-2 rounded-md bg-(--foreground) text-(--background) font-bold text-md cursor-pointer hover:opacity-80 transition" disabled={isLoading}>
                     {isLoading ? "Creating an account..." : "Sign up"}
                   </button>
                 </div>

@@ -16,7 +16,7 @@ export default function Footer() {
             <a href="/terms" className="hover:text-(--primary)">
               Terms
             </a>
-            <a href="https://github.com/starDust1703/LineLess" className="hover:text-(--primary)">
+            <a href="https://github.com/starDust1703/LineLess" target="_blank" rel="noopener noreferrer" className="hover:text-(--primary)">
               GitHub
             </a>
           </div>
