@@ -1,12 +1,11 @@
 "use client";
-import ClickSpark from "@/components/ClickSpark";
-import TextType from "@/components/TextType";
-import { Card } from "@/components/ui/card";
-import { createClient } from "@/lib/supabase/client";
+import ClickSpark from "../components/ClickSpark";
+import TextType from "../components/TextType";
+import { createClient } from "../lib/supabase/client";
 import Link from "next/link";
 
 export default function Home() {
-  const supabase = createClient();
+  // const supabase = createClient();
 
   return (
     <ClickSpark
@@ -50,7 +49,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <Card>Hello</Card>
       </main>
     </ClickSpark>
   );

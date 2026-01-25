@@ -1,6 +1,5 @@
 "use client";
 import { useRef, useEffect, useCallback, useState } from 'react';
-import "@/app/globals.css";
 
 const ClickSpark = ({
   sparkSize = 10,
