@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function SignUp() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
@@ -44,6 +45,12 @@ export default function SignUp() {
       setError(error ? error.message : "An error occurred");
     } finally {
       setIsLoading(false);
+      const { data: { user } } = await supabase.auth.getUser();
+
+      await supabase.from('profiles').insert({
+        id: user.id,
+        name
+      });
     }
   };
 
@@ -66,10 +73,24 @@ export default function SignUp() {
               <form onSubmit={handleSignUp}>
                 <div className="flex flex-col gap-6">
                   <div className="grid gap-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                      id="name"
+                      type="text"
+                      pattern="[A-Za-z\s]+"
+                      title="Only Latin letters allowed"
+                      placeholder="Alice"
+                      required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       type="email"
+                      title="Enter a valid email address"
                       placeholder="m@example.com"
                       required
                       value={email}
@@ -77,12 +98,11 @@ export default function SignUp() {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <div className="flex items-center">
-                      <Label htmlFor="password">Password</Label>
-                    </div>
+                    <Label htmlFor="password">Password</Label>
                     <Input
                       id="password"
                       type="password"
+                      title="Password must be at least 6 characters"
                       placeholder="Password"
                       required
                       value={password}
@@ -90,12 +110,11 @@ export default function SignUp() {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <div className="flex items-center">
-                      <Label htmlFor="repeat-password">Repeat Password</Label>
-                    </div>
+                    <Label htmlFor="repeat-password">Repeat Password</Label>
                     <Input
                       id="repeat-password"
                       type="password"
+                      title="Must match the password above"
                       placeholder="Password"
                       required
                       value={repeatPassword}

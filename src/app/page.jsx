@@ -47,7 +47,7 @@ export default function Home() {
             />
           </h1>
 
-          <p className="text-muted-foreground text-lg mt-4 max-w-2xl">
+          <p className="text-(--muted-foreground) text-lg mt-4 max-w-2xl">
             Lineless replaces physical queues with digital tokens, letting users wait remotely and get notified in real time.
           </p>
 
@@ -69,7 +69,7 @@ export default function Home() {
         </section>
 
         <section className="bg-(--background) py-24 px-6 text-center">
-          <h1 className="text-5xl font-bold text-foreground max-w-3xl mx-auto">
+          <h1 className="text-5xl font-bold text-(--foreground) max-w-3xl mx-auto">
             Manage Queues Digitally. Keep Everything Moving.
           </h1>
           <p className="mt-6 text-lg text-(--muted-foreground) max-w-2xl mx-auto">
