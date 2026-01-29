@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "../components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,7 +28,7 @@ const ThemeSwitcher = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="cursor-pointer hover:text-(--foreground)" size={"sm"}>
+        <button className="cursor-pointer hover:text-(--foreground) outline-none" size={"sm"}>
           {theme === "light" ? (
             <Sun
               key="light"
@@ -46,22 +45,22 @@ const ThemeSwitcher = () => {
               size={ICON_SIZE}
             />
           )}
-        </Button>
+        </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-content backdrop-blur-xl" align="start">
+      <DropdownMenuContent className="w-content backdrop-blur-xl relative top-3 border-(--muted-foreground)/30" align="start">
         <DropdownMenuRadioGroup
           value={theme}
           onValueChange={(e) => setTheme(e)}
         >
-          <DropdownMenuRadioItem className="flex gap-2 cursor-pointer" value="light">
+          <DropdownMenuRadioItem className="flex gap-2 cursor-pointer hover:bg-(--muted)/70" value="light">
             <Sun size={ICON_SIZE} className="text-(--muted-foreground)" />{" "}
             <span>Light</span>
           </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem className="flex gap-2 cursor-pointer" value="dark">
+          <DropdownMenuRadioItem className="flex gap-2 cursor-pointer hover:bg-(--muted)/70" value="dark">
             <Moon size={ICON_SIZE} className="text-(--muted-foreground)" />{" "}
             <span>Dark</span>
           </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem className="flex gap-2 cursor-pointer" value="system">
+          <DropdownMenuRadioItem className="flex gap-2 cursor-pointer hover:bg-(--muted)/70" value="system">
             <Laptop size={ICON_SIZE} className="text-(--muted-foreground)" />{" "}
             <span>System</span>
           </DropdownMenuRadioItem>

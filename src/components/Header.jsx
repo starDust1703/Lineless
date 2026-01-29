@@ -2,12 +2,12 @@
 import Link from "next/link";
 import { ThemeSwitcher } from "./theme-switcher";
 import { usePathname, useRouter } from "next/navigation";
+import AuthButton from "./AuthButton";
 
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const scrollToFeatures = () => {
-
     if (pathname !== "/") {
       router.push("/#features");
     } else {
@@ -18,7 +18,7 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-(--border)  backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-(--border)  backdrop-blur bg-(--background)/85">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Link
           href="/"
@@ -32,16 +32,11 @@ export default function Header() {
           <button onClick={scrollToFeatures} className="hover:text-(--foreground) cursor-pointer">
             Features
           </button>
-          <Link href="/pricing" className="hover:text-(--foreground)">
-            Pricing
+          <Link href="/guide" className="hover:text-(--foreground)">
+            Guide
           </Link>
 
-          <Link
-            href="/login"
-            className="rounded-md border border-border px-3 py-1.5 text-(--foreground) hover:bg-(--muted)"
-          >
-            Sign in
-          </Link>
+          <AuthButton />
         </nav>
       </div>
     </header>

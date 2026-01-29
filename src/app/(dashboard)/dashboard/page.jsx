@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { MapPin, Users, Plus, LogIn, Clock, Navigation } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import { createClient } from '../../../lib/supabase/client';
 
 const Dashboard = () => {
@@ -11,7 +12,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('nearby');
   const [joinQueueId, setJoinQueueId] = useState('');
-  const [newQueue, setNewQueue] = useState({ name: '', adminKey: '' });
+  const [newQueue, setNewQueue] = useState({ name: '', adminKey: '', passKey: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const supabase = createClient();
@@ -25,11 +26,13 @@ const Dashboard = () => {
       // Get user location
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          (position) => {
-            setLocation({
+          async (position) => {
+            const loc = {
               latitude: position.coords.latitude,
               longitude: position.coords.longitude
-            });
+            };
+            await fetchNearbyQueues(loc);
+            setLocation(loc);
           },
           (error) => {
             console.error('Location error:', error);
@@ -41,8 +44,8 @@ const Dashboard = () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
 
-      // Fetch nearby queues and user queues
-      await Promise.all([fetchNearbyQueues(), fetchUserQueues(user)]);
+      // Fetch user queues
+      await fetchUserQueues(user);
 
       setLoading(false);
     } catch (err) {
@@ -62,7 +65,7 @@ const Dashboard = () => {
     return R * c;
   };
 
-  const fetchNearbyQueues = async () => {
+  const fetchNearbyQueues = async (loc) => {
     try {
       const { data, error } = await supabase
         .from('queues')
@@ -74,12 +77,12 @@ const Dashboard = () => {
       // Add distance calculation and sort
       const queuesWithDistance = data.map(queue => ({
         ...queue,
-        distance: location ? calculateDistance(
-          location.latitude,
-          location.longitude,
+        distance: calculateDistance(
+          loc.latitude,
+          loc.longitude,
           queue.latitude,
           queue.longitude
-        ) : 0
+        )
       }));
 
       // Sort by population (already done), but you can also sort by distance
@@ -107,60 +110,35 @@ const Dashboard = () => {
   };
 
   const handleJoinQueue = async (queueId) => {
-    try {
-      setError('');
-      setSuccess('');
+    const qId = queueId || joinQueueId;
+    if (!qId) throw new Error('Please enter a queue ID');
 
-      const qId = queueId || joinQueueId;
-      if (!qId) {
-        setError('Please enter a queue ID');
-        return;
-      }
+    const { data, error } = await supabase.rpc('join_queue', {
+      q_id: qId,
+      u_id: user.id,
+    });
 
-      // Check if already in queue
-      const { data: existing } = await supabase
-        .from('queue_members')
-        .select('*')
-        .eq('queue_id', qId)
-        .eq('user_id', user.id)
-        .single();
+    if (error) throw error;
 
-      if (existing) {
-        setError('You are already in this queue');
-        return;
-      }
+    setJoinQueueId('');
 
-      // Get current max position
-      const { data: queue } = await supabase
-        .from('queues')
-        .select('population')
-        .eq('id', qId)
-        .single();
+    await Promise.all([
+      fetchNearbyQueues(location),
+      fetchUserQueues(user),
+    ]);
+  };
 
-      if (!queue) {
-        setError('Queue not found');
-        return;
-      }
+  const handleLeaveQueue = async (qmId) => {
+    const { error } = await supabase.rpc('leave_queue', {
+      qm_id: qmId,
+    });
 
-      // Join queue
-      await supabase.from('queue_members').insert({
-        queue_id: qId,
-        user_id: user.id,
-        position: queue.population + 1
-      });
+    if (error) return console.error(error);
 
-      // Update queue population
-      await supabase
-        .from('queues')
-        .update({ population: queue.population + 1 })
-        .eq('id', qId);
-
-      setSuccess('Successfully joined queue!');
-      setJoinQueueId('');
-      await Promise.all([fetchNearbyQueues(), fetchUserQueues()]);
-    } catch (err) {
-      setError('Failed to join queue');
-    }
+    await Promise.all([
+      fetchNearbyQueues(location),
+      fetchUserQueues(user),
+    ]);
   };
 
   const handleCreateQueue = async () => {
@@ -170,6 +148,14 @@ const Dashboard = () => {
 
       if (!newQueue.name) {
         setError('Please enter a queue name');
+        return;
+      }
+      if (!newQueue.passKey) {
+        setError('Please enter a pass key');
+        return;
+      }
+      if (newQueue.passKey.length > 16) {
+        setError('Pass key can be atmost 16 characters');
         return;
       }
 
@@ -194,14 +180,17 @@ const Dashboard = () => {
       await supabase.from('queues').insert({
         name: newQueue.name,
         created_by: user.id,
+        pass: newQueue.passKey,
         latitude: location.latitude,
         longitude: location.longitude,
         population: 0
+      }).catch((err) => {
+        setError(err);
       });
 
       setSuccess('Queue created successfully!');
-      setNewQueue({ name: '', adminKey: '' });
-      await fetchNearbyQueues();
+      setNewQueue({ name: '', adminKey: '', passKey: '' });
+      await fetchNearbyQueues(location);
       setActiveTab('nearby');
     } catch (err) {
       setError('Failed to create queue');
@@ -298,7 +287,20 @@ const Dashboard = () => {
                           </div>
                         </div>
                         <button
-                          onClick={() => handleJoinQueue(queue.id)}
+                          onClick={() =>
+                            toast.promise(handleJoinQueue(), {
+                              loading: "Joining...",
+                              success: `Joined Queue ${queue.name} at position ${queue.population + 1}`,
+                              error: (err) => err.message,
+                            }, {
+                              success: {
+                                style: { background: "#16a34a", color: "white" }
+                              },
+                              error: {
+                                style: { background: "#dc2626", color: "white" }
+                              }
+                            })
+                          }
                           className="px-4 py-2 rounded-md transition-colors bg-(--primary) text-(--primary-foreground) cursor-pointer hover:opacity-90"
                         >
                           Join
@@ -323,10 +325,13 @@ const Dashboard = () => {
                     <div
                       key={qm.id}
                       className="border border-(--border) rounded-lg p-4 transition-shadow hover:shadow-md">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="text-lg font-semibold text-(--ring)">{qm.queues.name}</h3>
-                          <div className="flex items-center gap-4 mt-2 text-sm text-(--muted-foreground)">
+                      <div className="flex justify-between items-start gap-4">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-lg font-semibold text-(--ring)">
+                            {qm.queues.name}
+                          </h3>
+
+                          <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-(--muted-foreground)">
                             <span className="font-medium text-(--foreground)">
                               Position: #{qm.position}
                             </span>
@@ -340,9 +345,32 @@ const Dashboard = () => {
                             </span>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className="text-2xl font-bold text-(--foreground)">#{qm.position}</div>
-                          <div className="text-xs text-(--muted-foreground)">Your Position</div>
+
+                        <div className="flex items-center gap-4">
+                          <button
+                            onClick={() =>
+                              toast.promise(
+                                handleLeaveQueue(qm.id),
+                                {
+                                  loading: "Loading...",
+                                  success: () => `Exited Queue ${qm.queues.name}`,
+                                  error: "Error",
+                                }
+                              )
+                            }
+                            className="py-2 px-4 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 bg-(--destructive) text-(--destructive-foreground) cursor-pointer shadow-md hover:opacity-90"
+                          >
+                            Quit
+                          </button>
+
+                          <div className="text-right">
+                            <div className="text-2xl font-bold text-(--foreground)">
+                              #{qm.position}
+                            </div>
+                            <div className="text-xs text-(--muted-foreground)">
+                              Your Position
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -359,24 +387,33 @@ const Dashboard = () => {
               </h2>
 
               <p className="mb-6 text-(--muted-foreground)">
-                Enter the queue ID to join
+                Enter the QKey to join
               </p>
 
               <div className="flex flex-col items-center">
                 <div className='max-w-md w-full'>
                   <label className="block text-sm font-medium mb-2 text-(--foreground)">
-                    Queue ID
+                    Queue key
                   </label>
 
                   <input
                     type="text"
                     value={joinQueueId}
                     onChange={(e) => setJoinQueueId(e.target.value)}
-                    placeholder="Enter queue ID"
+                    placeholder="Enter queue key"
                     className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)" />
 
                   <button
-                    onClick={() => handleJoinQueue()}
+                    onClick={() =>
+                      toast.promise(
+                        handleJoinQueue(),
+                        {
+                          loading: "Joining...",
+                          success: () => `Joined ${qm.queues.name}`,
+                          error: (err) => err.message,
+                        }
+                      )
+                    }
                     className="mt-4 w-full py-2 px-4 rounded-md font-medium transition-colors bg-(--primary) text-(--primary-foreground) hover:opacity-90 cursor-pointer">
                     Join Queue
                   </button>
@@ -409,7 +446,23 @@ const Dashboard = () => {
                         setNewQueue({ ...newQueue, name: e.target.value })
                       }
                       placeholder="e.g., Hospital Registration"
-                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)" />
+                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)"
+                      required />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-(--foreground)">
+                      Queue Key
+                    </label>
+
+                    <input
+                      value={newQueue.passKey}
+                      onChange={(e) =>
+                        setNewQueue({ ...newQueue, passKey: e.target.value })
+                      }
+                      placeholder="Create a Queue key"
+                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)"
+                      required />
                   </div>
 
                   <div>
@@ -424,11 +477,12 @@ const Dashboard = () => {
                         setNewQueue({ ...newQueue, adminKey: e.target.value })
                       }
                       placeholder="Enter your admin key"
-                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)" />
+                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)"
+                      required />
                   </div>
 
                   <button
-                    onClick={() => handleCreateQueue}
+                    onClick={handleCreateQueue}
                     className="mt-4 w-full py-2 px-4 rounded-md font-medium transition-colors bg-(--primary) text-(--primary-foreground) hover:opacity-90 cursor-pointer">
                     Create Queue
                   </button>
@@ -438,7 +492,7 @@ const Dashboard = () => {
           )}
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

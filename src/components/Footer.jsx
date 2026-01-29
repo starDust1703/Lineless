@@ -10,11 +10,8 @@ export default function Footer() {
           </p>
 
           <div className="flex gap-6 text-sm text-(--muted-foreground)">
-            <a href="/privacy" className="hover:text-(--primary)">
-              Privacy
-            </a>
-            <a href="/terms" className="hover:text-(--primary)">
-              Terms
+            <a href="/legal" className="hover:text-(--primary)">
+              Terms & Privacy
             </a>
             <a href="https://github.com/starDust1703/LineLess" target="_blank" rel="noopener noreferrer" className="hover:text-(--primary)">
               GitHub

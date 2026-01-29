@@ -1,7 +1,6 @@
 "use client";
 import ClickSpark from "../../../components/ClickSpark";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
-import { Input } from "../../../components/ui/input";
 import { createClient } from "../../../lib/supabase/client";
 import { cn } from "../../../lib/utils";
 import { Label } from "@radix-ui/react-dropdown-menu";
@@ -74,7 +73,7 @@ export default function SignUp() {
                 <div className="flex flex-col gap-6">
                   <div className="grid gap-2">
                     <Label htmlFor="name">Name</Label>
-                    <Input
+                    <input
                       id="name"
                       type="text"
                       pattern="[A-Za-z\s]+"
@@ -83,11 +82,12 @@ export default function SignUp() {
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
+                      className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded outline-none focus:border-(--ring) focus:border-2"
                     />
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input
+                    <input
                       id="email"
                       type="email"
                       title="Enter a valid email address"
@@ -95,11 +95,12 @@ export default function SignUp() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded outline-none focus:border-(--ring) focus:border-2"
                     />
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="password">Password</Label>
-                    <Input
+                    <input
                       id="password"
                       type="password"
                       title="Password must be at least 6 characters"
@@ -107,11 +108,12 @@ export default function SignUp() {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded outline-none focus:border-(--ring) focus:border-2"
                     />
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="repeat-password">Repeat Password</Label>
-                    <Input
+                    <input
                       id="repeat-password"
                       type="password"
                       title="Must match the password above"
@@ -119,6 +121,7 @@ export default function SignUp() {
                       required
                       value={repeatPassword}
                       onChange={(e) => setRepeatPassword(e.target.value)}
+                      className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded outline-none focus:border-(--ring) focus:border-2"
                     />
                   </div>
                   {error && <p className="text-sm text-red-500">{error}</p>}

@@ -5,7 +5,6 @@ import { useState } from "react";
 import { cn } from "../../../lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Label } from "@radix-ui/react-dropdown-menu";
-import { Input } from "../../../components/ui/input";
 import Link from "next/link";
 import ClickSpark from "../../../components/ClickSpark";
 
@@ -57,13 +56,14 @@ export default function LoginForm() {
                 <div className="flex flex-col gap-6">
                   <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input
+                    <input
                       id="email"
                       type="email"
                       placeholder="m@example.com"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded outline-none focus:border-(--ring) focus:border-2"
                     />
                   </div>
                   <div className="grid gap-2">
@@ -76,13 +76,14 @@ export default function LoginForm() {
                         Forgot your password?
                       </Link>
                     </div>
-                    <Input
+                    <input
                       id="password"
                       type="password"
                       placeholder="Password"
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded outline-none focus:border-(--ring) focus:border-2"
                     />
                   </div>
                   {error && <p className="text-sm text-red-500">{error}</p>}
