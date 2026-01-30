@@ -1,4 +1,3 @@
-import Header from "../../components/Header";
 import { createClient } from "../../lib/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -10,5 +9,5 @@ export default async function DashboardLayout({ children }) {
     redirect("/login");
   }
 
-  return <><Header/>{children}</>;
+  return <>{children}</>;
 }

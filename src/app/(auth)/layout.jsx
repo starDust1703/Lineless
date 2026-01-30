@@ -11,6 +11,5 @@ export default async function DashboardLayout({ children }) {
     redirect("/dashboard");
   }
 
-  return <>
-  <Header/>{children}<Footer/></>;
+  return <>{children}<Footer/></>;
 }

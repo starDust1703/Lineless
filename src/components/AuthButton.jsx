@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 
-export default function AuthButton() {
+export default function AuthButton({ user }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const ref = useRef(null);
@@ -27,8 +27,7 @@ export default function AuthButton() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const fetchUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+  const fetchName = async () => {
     if (!user) return null;
     const { data: { name } } = await supabase
       .from('profiles')
@@ -38,7 +37,7 @@ export default function AuthButton() {
     setName(name);
   }
   useEffect(() => {
-    fetchUser();
+    fetchName();
   }, [])
 
   const handleLogout = async () => {
@@ -48,17 +47,17 @@ export default function AuthButton() {
     router.refresh();
   };
 
-  return name ? (
+  return user ? (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
           onClick={() => setOpen(!open)}
           className="flex h-9 w-9 items-center justify-center rounded-full border border-(--border) bg-(--muted) text-sm font-semibold hover:bg-(--primary)/10 outline-none cursor-pointer"
         >
-          {name[0].toUpperCase()}
+          {name[0]?.toUpperCase()}
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-content backdrop-blur-xl relative top-2 right-20 border-(--muted-foreground)/30" align="start">
+      <DropdownMenuContent className="w-content backdrop-blur-xl absolute top-2 -right-5 border-(--muted-foreground)/30" align="start">
         <DropdownMenuGroup className="flex flex-col gap-1">
           <DropdownMenuItem className="flex gap-2 cursor-pointer hover:bg-(--muted)/70">
             <span>{name}</span>

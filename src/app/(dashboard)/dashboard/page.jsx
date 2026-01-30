@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { MapPin, Users, Plus, LogIn, Clock, Navigation } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import { createClient } from '../../../lib/supabase/client';
 
 const Dashboard = () => {
@@ -11,8 +11,8 @@ const Dashboard = () => {
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('nearby');
-  const [joinQueueId, setJoinQueueId] = useState('');
-  const [newQueue, setNewQueue] = useState({ name: '', adminKey: '', passKey: '' });
+  const [joinQueueKey, setJoinQueueKey] = useState('');
+  const [newQueue, setNewQueue] = useState({ name: '', adminKey: '', qKey: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const supabase = createClient();
@@ -31,7 +31,11 @@ const Dashboard = () => {
               latitude: position.coords.latitude,
               longitude: position.coords.longitude
             };
-            await fetchNearbyQueues(loc);
+
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+
+            await Promise.all([fetchNearbyQueues(loc), fetchUserQueues(user)]);
             setLocation(loc);
           },
           (error) => {
@@ -39,13 +43,6 @@ const Dashboard = () => {
           }
         );
       }
-
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-
-      // Fetch user queues
-      await fetchUserQueues(user);
 
       setLoading(false);
     } catch (err) {
@@ -110,17 +107,21 @@ const Dashboard = () => {
   };
 
   const handleJoinQueue = async (queueId) => {
-    const qId = queueId || joinQueueId;
+    if (!queueId) {
+      const {data} = await supabase.from('queues').select('*').eq('q_key', joinQueueKey).single();
+      if (!data) return;
+      queueId = data.id;
+    }
+    const qId = queueId;
     if (!qId) throw new Error('Please enter a queue ID');
 
-    const { data, error } = await supabase.rpc('join_queue', {
-      q_id: qId,
-      u_id: user.id,
+    const { error } = await supabase.rpc('join_queue', {
+      q_id: qId
     });
 
     if (error) throw error;
 
-    setJoinQueueId('');
+    setJoinQueueKey('');
 
     await Promise.all([
       fetchNearbyQueues(location),
@@ -150,12 +151,12 @@ const Dashboard = () => {
         setError('Please enter a queue name');
         return;
       }
-      if (!newQueue.passKey) {
-        setError('Please enter a pass key');
+      if (!newQueue.qKey) {
+        setError('Please enter a Queue key');
         return;
       }
-      if (newQueue.passKey.length > 16) {
-        setError('Pass key can be atmost 16 characters');
+      if (newQueue.qKey.length > 16) {
+        setError('Queue key can be atmost 16 characters');
         return;
       }
 
@@ -180,16 +181,14 @@ const Dashboard = () => {
       await supabase.from('queues').insert({
         name: newQueue.name,
         created_by: user.id,
-        pass: newQueue.passKey,
+        q_key: newQueue.qKey,
         latitude: location.latitude,
         longitude: location.longitude,
         population: 0
-      }).catch((err) => {
-        setError(err);
-      });
+      })
 
       setSuccess('Queue created successfully!');
-      setNewQueue({ name: '', adminKey: '', passKey: '' });
+      setNewQueue({ name: '', adminKey: '', qKey: '' });
       await fetchNearbyQueues(location);
       setActiveTab('nearby');
     } catch (err) {
@@ -288,18 +287,14 @@ const Dashboard = () => {
                         </div>
                         <button
                           onClick={() =>
-                            toast.promise(handleJoinQueue(), {
-                              loading: "Joining...",
-                              success: `Joined Queue ${queue.name} at position ${queue.population + 1}`,
-                              error: (err) => err.message,
-                            }, {
-                              success: {
-                                style: { background: "#16a34a", color: "white" }
-                              },
-                              error: {
-                                style: { background: "#dc2626", color: "white" }
+                            toast.promise(
+                              handleJoinQueue(queue.id),
+                              {
+                                loading: "Joining...",
+                                success: () => `Joined ${queue.name} at position ${queue.population + 1}`,
+                                error: err => err.message,
                               }
-                            })
+                            )
                           }
                           className="px-4 py-2 rounded-md transition-colors bg-(--primary) text-(--primary-foreground) cursor-pointer hover:opacity-90"
                         >
@@ -353,7 +348,7 @@ const Dashboard = () => {
                                 handleLeaveQueue(qm.id),
                                 {
                                   loading: "Loading...",
-                                  success: () => `Exited Queue ${qm.queues.name}`,
+                                  success: () => `Exited ${qm.queues.name}`,
                                   error: "Error",
                                 }
                               )
@@ -398,8 +393,8 @@ const Dashboard = () => {
 
                   <input
                     type="text"
-                    value={joinQueueId}
-                    onChange={(e) => setJoinQueueId(e.target.value)}
+                    value={joinQueueKey}
+                    onChange={(e) => setJoinQueueKey(e.target.value)}
                     placeholder="Enter queue key"
                     className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)" />
 
@@ -456,9 +451,9 @@ const Dashboard = () => {
                     </label>
 
                     <input
-                      value={newQueue.passKey}
+                      value={newQueue.qKey}
                       onChange={(e) =>
-                        setNewQueue({ ...newQueue, passKey: e.target.value })
+                        setNewQueue({ ...newQueue, qKey: e.target.value })
                       }
                       placeholder="Create a Queue key"
                       className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)"
@@ -492,7 +487,7 @@ const Dashboard = () => {
           )}
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 
