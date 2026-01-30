@@ -2,14 +2,10 @@
 import Link from "next/link";
 import { ThemeSwitcher } from "./theme-switcher";
 import { usePathname, useRouter } from "next/navigation";
-import AuthButton from "./AuthButton";
-import { createClient } from "../lib/supabase/client";
-import { useEffect, useState } from "react";
 
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState(null);
 
   const scrollToFeatures = () => {
     if (pathname !== "/") {
@@ -20,15 +16,6 @@ export default function Header() {
         ?.scrollIntoView({ behavior: "smooth" });
     }
   };
-  const fetchUser = async () => {
-    const supabase = createClient();
-    const { data } = await supabase.auth.getSession();
-    setUser(data.session.user);
-  }
-
-  useEffect(() => {
-    fetchUser();
-  }, []);
 
   return (
     <header className="sticky top-0 z-50 border-b border-(--border)  backdrop-blur bg-(--background)/70">
@@ -49,7 +36,12 @@ export default function Header() {
             Guide
           </Link>
 
-          {user && <AuthButton user={user} />}
+          <Link
+            href="/login"
+            className="rounded-md border border-border px-3 py-1.5 text-(--foreground) hover:bg-(--muted)"
+          >
+            Sign in
+          </Link>
         </nav>
       </div>
     </header>

@@ -33,10 +33,7 @@ const Dashboard = () => {
           schema: 'public',
           table: 'queue_members',
         },
-        payload => {
-          console.log('REALTIME:', payload);
-
-          // refresh affected UI
+        (payload) => {
           fetchUserQueues(user);
           if (location) fetchNearbyQueues(location);
         }
@@ -105,7 +102,12 @@ const Dashboard = () => {
           queue.latitude,
           queue.longitude
         )
-      }));
+      })).sort((a, b) => {
+        if (a.distance !== b.distance) {
+          return a.distance - b.distance; // closer first
+        }
+        return b.population - a.population; // more crowded first
+      });
 
       setNearbyQueues(queuesWithDistance);
     } catch (err) {
@@ -124,7 +126,7 @@ const Dashboard = () => {
         .order('position', { ascending: true });
 
       if (error) throw error;
-      setUserQueues(data || []);
+      setUserQueues((data || []).sort((a, b) => a.position - b.position));
     } catch (err) {
       console.error('Error fetching user queues:', err);
     }
@@ -233,8 +235,8 @@ const Dashboard = () => {
     <div className="min-h-[90vh] bg-(--background)">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-4xl text-(--foreground) font-bold mb-2">LineLess Dashboard</h1>
-          <p className="text-(--muted-foreground)">Manage your queues digitally</p>
+          <h1 className="text-3xl text-(--foreground) font-bold mb-2 sm:text-4xl">LineLess Dashboard</h1>
+          <p className="text-(--muted-foreground) text-sm sm:text-md">Manage your queues digitally</p>
         </div>
 
         {error && (
@@ -248,7 +250,7 @@ const Dashboard = () => {
           </div>
         )}
 
-        <div className="flex gap-2 mb-6 rounded-lg p-1 shadow bg-(--card)">
+        <div className="flex gap-2 mb-6 rounded-lg p-1 shadow bg-(--card) text-xs md:text-lg">
           <button
             onClick={() => setActiveTab('nearby')}
             className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer ${activeTab === 'nearby' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
@@ -282,8 +284,8 @@ const Dashboard = () => {
         <div className="rounded-lg shadow-lg p-6 bg-(--card)">
           {activeTab === 'nearby' && (
             <div>
-              <h2 className="text-2xl mb-2 font-bold text-(--foreground)">Queues Near You</h2>
-              <p className="mb-6 text-(--muted-foreground)">Sorted by popularity</p>
+              <h2 className="sm:text-2xl text-xl mb-2 font-bold text-(--foreground)">Queues Near You</h2>
+              <p className="mb-6 text-(--muted-foreground) text-xs sm:text-lg">Sorted by popularity</p>
               <div className="space-y-4">
                 {nearbyQueues.length === 0 ? (
                   <p className="text-center py-8 text-(--muted-foreground)">No queues nearby</p>
@@ -332,8 +334,8 @@ const Dashboard = () => {
 
           {activeTab === 'my-queues' && (
             <div>
-              <h2 className="text-2xl font-bold mb-2 text-(--foreground)">Your Active Queues</h2>
-              <p className="mb-6 text-(--muted-foreground)">Sorted by your position</p>
+              <h2 className="sm:text-2xl text-xl font-bold mb-2 text-(--foreground)">Your Active Queues</h2>
+              <p className="mb-6 text-(--muted-foreground) text-xs sm:text-lg">Sorted by your position</p>
               <div className="space-y-4">
                 {userQueues.length === 0 ? (
                   <p className="text-center py-8 text-(--muted-foreground)">You're not in any queues</p>
@@ -399,11 +401,11 @@ const Dashboard = () => {
 
           {activeTab === 'join' && (
             <div>
-              <h2 className="text-2xl font-bold mb-2 text-(--foreground)">
+              <h2 className="sm:text-2xl text-xl font-bold mb-2 text-(--foreground)">
                 Join a Queue
               </h2>
 
-              <p className="mb-6 text-(--muted-foreground)">
+              <p className="mb-6 text-(--muted-foreground) text-xs sm:text-lg">
                 Enter the QKey to join
               </p>
 
@@ -441,11 +443,11 @@ const Dashboard = () => {
 
           {activeTab === 'create' && (
             <div>
-              <h2 className="text-2xl font-bold mb-2 text-(--foreground)">
+              <h2 className="sm:text-2xl text-xl font-bold mb-2 text-(--foreground)">
                 Create a New Queue
               </h2>
 
-              <p className="mb-6 text-(--muted-foreground)">
+              <p className="mb-6 text-(--muted-foreground) text-xs sm:text-lg">
                 Admin access required
               </p>
 
