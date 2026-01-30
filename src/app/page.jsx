@@ -44,7 +44,12 @@ export default function Home() {
 
     checkUser();
   }, []);
- return (
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+
+  return (
     <div>
       {user ? <UserHeader user={user} /> : <Header />}
       <ClickSpark
@@ -68,8 +73,7 @@ export default function Home() {
             </h1>
 
             <p className="mt-5 max-w-2xl text-lg text-(--muted-foreground)">
-              Lineless replaces physical queues with digital tokens, letting users wait remotely
-              and get notified in real time.
+              Lineless replaces physical queues with digital tokens, letting users wait remotely and get notified in real time.
             </p>
 
             <div className="mt-8 flex w-full max-w-md flex-col gap-4 sm:flex-row sm:justify-center">
@@ -104,8 +108,7 @@ export default function Home() {
               Manage Queues Digitally. Keep Everything Moving.
             </h2>
             <p className="mx-auto mt-6 max-w-prose text-lg text-(--muted-foreground)">
-              Lineless helps you manage queues digitally, track flow in real time,
-              and reduce on-site congestion.
+              Lineless helps you manage queues digitally, track flow in real time, and reduce on-site congestion.
             </p>
           </section>
 

@@ -371,7 +371,7 @@ const Dashboard = () => {
                               toast.promise(
                                 handleLeaveQueue(qm.id),
                                 {
-                                  loading: "Loading...",
+                                  loading: "Quitting...",
                                   success: () => `Exited ${qm.queues.name}`,
                                   error: "Error",
                                 }
