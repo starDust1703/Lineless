@@ -236,7 +236,7 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl text-(--foreground) font-bold mb-2 sm:text-4xl">LineLess Dashboard</h1>
-          <p className="text-(--muted-foreground) text-sm sm:text-md">Manage your queues digitally</p>
+          <p className="text-(--muted-foreground) text-sm sm:text-[16px]">Manage your queues digitally</p>
         </div>
 
         {error && (
@@ -250,34 +250,34 @@ const Dashboard = () => {
           </div>
         )}
 
-        <div className="flex gap-2 mb-6 rounded-lg p-1 shadow bg-(--card) text-xs md:text-lg">
+        <div className="flex gap-2 mb-6 rounded-lg p-1 shadow bg-(--card) text-xs sm:text-[16px]">
           <button
             onClick={() => setActiveTab('nearby')}
-            className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer ${activeTab === 'nearby' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
+            className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer flex items-center justify-center ${activeTab === 'nearby' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
           >
             <Navigation className="inline w-4 h-4 mr-2" />
-            Nearby Queues
+            <div>Nearby Queues</div>
           </button>
           <button
             onClick={() => setActiveTab('my-queues')}
-            className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer ${activeTab === 'my-queues' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
+            className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer flex items-center justify-center ${activeTab === 'my-queues' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
           >
             <Clock className="inline w-4 h-4 mr-2" />
-            My Queues
+            <div>My Queues</div>
           </button>
           <button
             onClick={() => setActiveTab('join')}
-            className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer ${activeTab === 'join' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
+            className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer flex items-center justify-center ${activeTab === 'join' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
           >
             <LogIn className="inline w-4 h-4 mr-2" />
-            Join Queue
+            <div>Join Queue</div>
           </button>
           <button
             onClick={() => setActiveTab('create')}
-            className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer ${activeTab === 'create' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
+            className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer flex items-center justify-center ${activeTab === 'create' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
           >
             <Plus className="inline w-4 h-4 mr-2" />
-            Create Queue
+            <div>Create Queue</div>
           </button>
         </div>
 
@@ -285,7 +285,7 @@ const Dashboard = () => {
           {activeTab === 'nearby' && (
             <div>
               <h2 className="sm:text-2xl text-xl mb-2 font-bold text-(--foreground)">Queues Near You</h2>
-              <p className="mb-6 text-(--muted-foreground) text-xs sm:text-lg">Sorted by popularity</p>
+              <p className="mb-6 text-(--muted-foreground) text-xs sm:text-sm">Sorted by popularity</p>
               <div className="space-y-4">
                 {nearbyQueues.length === 0 ? (
                   <p className="text-center py-8 text-(--muted-foreground)">No queues nearby</p>
@@ -335,7 +335,7 @@ const Dashboard = () => {
           {activeTab === 'my-queues' && (
             <div>
               <h2 className="sm:text-2xl text-xl font-bold mb-2 text-(--foreground)">Your Active Queues</h2>
-              <p className="mb-6 text-(--muted-foreground) text-xs sm:text-lg">Sorted by your position</p>
+              <p className="mb-6 text-(--muted-foreground) text-xs sm:text-sm">Sorted by your position</p>
               <div className="space-y-4">
                 {userQueues.length === 0 ? (
                   <p className="text-center py-8 text-(--muted-foreground)">You're not in any queues</p>
@@ -405,7 +405,7 @@ const Dashboard = () => {
                 Join a Queue
               </h2>
 
-              <p className="mb-6 text-(--muted-foreground) text-xs sm:text-lg">
+              <p className="mb-6 text-(--muted-foreground) text-xs sm:text-sm">
                 Enter the QKey to join
               </p>
 
@@ -447,7 +447,7 @@ const Dashboard = () => {
                 Create a New Queue
               </h2>
 
-              <p className="mb-6 text-(--muted-foreground) text-xs sm:text-lg">
+              <p className="mb-6 text-(--muted-foreground) text-xs sm:text-sm">
                 Admin access required
               </p>
 
