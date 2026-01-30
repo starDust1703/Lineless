@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { Label } from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
 import ClickSpark from "../../../components/ClickSpark";
+import AuthClientGuard from "../AuthClientGuard";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -27,7 +28,7 @@ export default function LoginForm() {
         password,
       });
       if (error) throw error;
-      router.push("/dashboard");
+      router.replace("/dashboard");
     } catch (error) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
@@ -42,6 +43,7 @@ export default function LoginForm() {
       sparkCount={8}
       duration={400}
     >
+      <AuthClientGuard />
       <div className="flex min-h-svh w-full bg items-center justify-center p-6 md:p-10">
         <div className={cn("flex flex-col gap-6")}>
           <Card>

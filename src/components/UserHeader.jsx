@@ -39,7 +39,7 @@ export default function UserHeader() {
     const { data: { name } } = await supabase
       .from('profiles')
       .select('name')
-      .eq('id', data.session.user.id)
+      .eq('id', data.session.user?.id)
       .single();
     setName(name);
   }
@@ -86,7 +86,7 @@ export default function UserHeader() {
                 onClick={() => setOpen(!open)}
                 className="flex h-9 w-9 items-center justify-center rounded-full border border-(--border) bg-(--muted) text-sm font-semibold hover:bg-(--primary)/10 outline-none cursor-pointer"
               >
-                {name[0]?.toUpperCase()}
+                {name && name[0]?.toUpperCase()}
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-content backdrop-blur-xl absolute top-2 -right-5 border-(--muted-foreground)/30" align="start">

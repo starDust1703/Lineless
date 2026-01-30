@@ -109,8 +109,10 @@ Built to remove chaos, not add features.
 
 ## Features
 - Light/Dark theme using next-themes
-- Authentication; Admin key allows creating queues
-- Live Queue Position Updates
+- Authentication with role-based access (Admin / User)
+- Create & join queues via Queue ID or QR code
+- Live queue position & population updates (Supabase Realtime)
+- Automatic FIFO position assignment
 
 ---
 
@@ -118,7 +120,7 @@ Built to remove chaos, not add features.
 
 LineLess is under active development.  
 Features may evolve, but the goal stays the same:  
-**make waiting suck less.**
+**Stop standing. Start waiting smart.**
 
 ---
 

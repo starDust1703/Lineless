@@ -4,6 +4,9 @@ import ClickSpark from "../components/ClickSpark";
 import TextType from "../components/TextType";
 import Link from "next/link";
 import Footer from "../components/Footer";
+import UserHeader from "../components/UserHeader";
+import { useEffect, useState } from "react";
+import { createClient } from "../lib/supabase/client";
 
 const features = [
   {
@@ -29,8 +32,21 @@ const features = [
 ];
 
 export default function Home() {
-  return (
+  const [user, setUser] = useState(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const checkUser = async () => {
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        setUser(user);
+      });
+    }
+
+    checkUser();
+  }, []);
+ return (
     <div>
+      {user ? <UserHeader /> : <Header />}
       <ClickSpark
         sparkSize={10}
         sparkRadius={15}

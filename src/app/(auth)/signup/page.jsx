@@ -7,6 +7,7 @@ import { Label } from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import AuthClientGuard from "../AuthClientGuard";
 
 export default function SignUp() {
   const [name, setName] = useState("");
@@ -61,6 +62,7 @@ export default function SignUp() {
       sparkCount={8}
       duration={400}
     >
+      <AuthClientGuard />
       <div className="flex min-h-svh w-full bg items-center justify-center p-6 md:p-10">
         <div className={cn("flex flex-col w-80 gap-6")}>
           <Card>
