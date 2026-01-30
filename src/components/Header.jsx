@@ -9,6 +9,8 @@ import { useEffect, useState } from "react";
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
+  const [user, setUser] = useState(null);
+
   const scrollToFeatures = () => {
     if (pathname !== "/") {
       router.push("/#features");
@@ -18,7 +20,6 @@ export default function Header() {
         ?.scrollIntoView({ behavior: "smooth" });
     }
   };
-  const [user, setUser] = useState(null);
   const fetchUser = async () => {
     const supabase = createClient();
     const { data } = await supabase.auth.getSession();

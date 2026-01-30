@@ -21,9 +21,35 @@ const Dashboard = () => {
     initializeDashboard();
   }, []);
 
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('queue-members-live')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'queue_members',
+        },
+        payload => {
+          console.log('REALTIME:', payload);
+
+          // refresh affected UI
+          fetchUserQueues(user);
+          if (location) fetchNearbyQueues(location);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, location]);
+
   const initializeDashboard = async () => {
     try {
-      // Get user location
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           async (position) => {
@@ -33,9 +59,9 @@ const Dashboard = () => {
             };
 
             const { data: { user } } = await supabase.auth.getUser();
-            setUser(user);
-
             await Promise.all([fetchNearbyQueues(loc), fetchUserQueues(user)]);
+
+            setUser(user);
             setLocation(loc);
           },
           (error) => {
@@ -71,7 +97,6 @@ const Dashboard = () => {
 
       if (error) throw error;
 
-      // Add distance calculation and sort
       const queuesWithDistance = data.map(queue => ({
         ...queue,
         distance: calculateDistance(
@@ -82,7 +107,6 @@ const Dashboard = () => {
         )
       }));
 
-      // Sort by population (already done), but you can also sort by distance
       setNearbyQueues(queuesWithDistance);
     } catch (err) {
       console.error('Error fetching queues:', err);
@@ -107,26 +131,24 @@ const Dashboard = () => {
   };
 
   const handleJoinQueue = async (queueId) => {
-    if (!queueId) {
-      const {data} = await supabase.from('queues').select('*').eq('q_key', joinQueueKey).single();
-      if (!data) return;
-      queueId = data.id;
-    }
-    const qId = queueId;
-    if (!qId) throw new Error('Please enter a queue ID');
+    const res = (!queueId) ? await supabase.from('queues').select('*').eq('q_key', joinQueueKey).single() : null;
+
+    if (!queueId && !res?.data) throw new Error("Please enter a valid queue key");
 
     const { error } = await supabase.rpc('join_queue', {
-      q_id: qId
+      q_id: queueId || res?.data.id
     });
 
     if (error) throw error;
 
     setJoinQueueKey('');
 
-    await Promise.all([
-      fetchNearbyQueues(location),
-      fetchUserQueues(user),
-    ]);
+    // await Promise.all([
+    //   fetchNearbyQueues(location),
+    //   fetchUserQueues(user),
+    // ]);
+
+    return res?.data?.name ?? null;
   };
 
   const handleLeaveQueue = async (qmId) => {
@@ -136,10 +158,10 @@ const Dashboard = () => {
 
     if (error) return console.error(error);
 
-    await Promise.all([
-      fetchNearbyQueues(location),
-      fetchUserQueues(user),
-    ]);
+    // await Promise.all([
+    //   fetchNearbyQueues(location),
+    //   fetchUserQueues(user),
+    // ]);
   };
 
   const handleCreateQueue = async () => {
@@ -189,7 +211,7 @@ const Dashboard = () => {
 
       setSuccess('Queue created successfully!');
       setNewQueue({ name: '', adminKey: '', qKey: '' });
-      await fetchNearbyQueues(location);
+      // await fetchNearbyQueues(location);
       setActiveTab('nearby');
     } catch (err) {
       setError('Failed to create queue');
@@ -404,7 +426,7 @@ const Dashboard = () => {
                         handleJoinQueue(),
                         {
                           loading: "Joining...",
-                          success: () => `Joined ${qm.queues.name}`,
+                          success: (res) => `Joined ${res || qm.queues.name}`,
                           error: (err) => err.message,
                         }
                       )

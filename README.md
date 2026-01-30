@@ -107,6 +107,13 @@ Built to remove chaos, not add features.
 
 ---
 
+## Features
+- Light/Dark theme using next-themes
+- Authentication; Admin key allows creating queues
+- Live Queue Position Updates
+
+---
+
 ## Current status
 
 LineLess is under active development.  
