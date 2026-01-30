@@ -10,5 +10,5 @@ export default async function DashboardLayout({ children }) {
     redirect("/login");
   }
 
-  return <><UserHeader/>{children}</>;
+  return <><UserHeader user={user} />{children}</>;
 }

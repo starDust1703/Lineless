@@ -46,7 +46,7 @@ export default function Home() {
   }, []);
  return (
     <div>
-      {user ? <UserHeader /> : <Header />}
+      {user ? <UserHeader user={user} /> : <Header />}
       <ClickSpark
         sparkSize={10}
         sparkRadius={15}

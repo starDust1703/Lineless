@@ -13,11 +13,9 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 
-export default function UserHeader() {
+export default function UserHeader({ user }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState(null);
-  const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const supabase = createClient();
 
@@ -32,14 +30,11 @@ export default function UserHeader() {
   };
   const fetchUser = async () => {
     const supabase = createClient();
-    const { data } = await supabase.auth.getSession();
-    if (!data) return null;
-    setUser(data.session.user);
 
     const { data: { name } } = await supabase
       .from('profiles')
       .select('name')
-      .eq('id', data.session.user?.id)
+      .eq('id', user?.id)
       .single();
     setName(name);
   }
@@ -50,7 +45,6 @@ export default function UserHeader() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setName(null);
-    setOpen(false);
     router.refresh();
   };
   const openCam = () => {
@@ -83,7 +77,6 @@ export default function UserHeader() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                onClick={() => setOpen(!open)}
                 className="flex h-9 w-9 items-center justify-center rounded-full border border-(--border) bg-(--muted) text-sm font-semibold hover:bg-(--primary)/10 outline-none cursor-pointer"
               >
                 {name && name[0]?.toUpperCase()}
