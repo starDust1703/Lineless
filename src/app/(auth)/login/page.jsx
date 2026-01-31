@@ -6,7 +6,7 @@ import { cn } from "../../../lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
-import ClickSpark from "../../../components/ClickSpark";
+import ClickSpark from "../../../components/ui/ClickSpark";
 import AuthClientGuard from "../AuthClientGuard";
 
 export default function LoginForm() {

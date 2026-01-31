@@ -1,5 +1,5 @@
 "use client";
-import ClickSpark from "../../../components/ClickSpark";
+import ClickSpark from "../../../components/ui/ClickSpark";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
 import { createClient } from "../../../lib/supabase/client";
 import { cn } from "../../../lib/utils";

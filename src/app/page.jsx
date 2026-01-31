@@ -1,7 +1,7 @@
 "use client";
 import Header from "../components/Header";
-import ClickSpark from "../components/ClickSpark";
-import TextType from "../components/TextType";
+import ClickSpark from "../components/ui/ClickSpark";
+import TextType from "../components/ui/TextType";
 import Link from "next/link";
 import Footer from "../components/Footer";
 import UserHeader from "../components/UserHeader";

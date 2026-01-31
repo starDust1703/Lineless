@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { MapPin, Users, Plus, LogIn, Clock, Navigation } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { MapPin, Users, LogIn, Clock, Navigation } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '../../../lib/supabase/client';
 import { useSearchParams } from 'next/navigation';
@@ -14,7 +14,6 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") ?? "nearby");
   const [joinQueueKey, setJoinQueueKey] = useState(searchParams.get("q") ?? "");
-  const [newQueue, setNewQueue] = useState({ name: "", adminKey: "", qKey: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const supabase = createClient();
@@ -58,18 +57,18 @@ const Dashboard = () => {
             };
 
             const { data: { user } } = await supabase.auth.getUser();
-            await Promise.all([fetchNearbyQueues(loc), fetchUserQueues(user)]);
 
             setUser(user);
             setLocation(loc);
+            await Promise.all([fetchNearbyQueues(loc), fetchUserQueues(user)]);
+            setLoading(false);
           },
           (error) => {
             console.error('Location error:', error);
+            setLoading(false);
           }
         );
       }
-
-      setLoading(false);
     } catch (err) {
       setError('Failed to initialize dashboard');
       setLoading(false);
@@ -168,60 +167,6 @@ const Dashboard = () => {
     // ]);
   };
 
-  const handleCreateQueue = async () => {
-    try {
-      setError('');
-      setSuccess('');
-
-      if (!newQueue.name) {
-        setError('Please enter a queue name');
-        return;
-      }
-      if (!newQueue.qKey) {
-        setError('Please enter a Queue key');
-        return;
-      }
-      if (newQueue.qKey.length > 16) {
-        setError('Queue key can be atmost 16 characters');
-        return;
-      }
-
-      // Verify admin key
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('admin_key')
-        .eq('id', user.id)
-        .single();
-
-      if (!profile?.admin_key || profile.admin_key !== newQueue.adminKey) {
-        setError('Invalid admin key');
-        return;
-      }
-
-      if (!location) {
-        setError('Location not available');
-        return;
-      }
-
-      // Create queue
-      await supabase.from('queues').insert({
-        name: newQueue.name,
-        created_by: user.id,
-        q_key: newQueue.qKey,
-        latitude: location.latitude,
-        longitude: location.longitude,
-        population: 0
-      })
-
-      setSuccess('Queue created successfully!');
-      setNewQueue({ name: '', adminKey: '', qKey: '' });
-      // await fetchNearbyQueues(location);
-      setActiveTab('nearby');
-    } catch (err) {
-      setError('Failed to create queue');
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-(--background)">
@@ -238,7 +183,7 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl text-(--foreground) font-bold mb-2 sm:text-4xl">LineLess Dashboard</h1>
-          <p className="text-(--muted-foreground) text-sm sm:text-[16px]">Manage your queues digitally</p>
+          <p className="text-(--muted-foreground) text-sm sm:text-[16px]">Join in queues digitally</p>
         </div>
 
         {error && (
@@ -274,20 +219,13 @@ const Dashboard = () => {
             <LogIn className="inline w-4 h-4 mr-2" />
             <div>Join Queue</div>
           </button>
-          <button
-            onClick={() => setActiveTab('create')}
-            className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer flex items-center justify-center ${activeTab === 'create' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
-          >
-            <Plus className="inline w-4 h-4 mr-2" />
-            <div>Create Queue</div>
-          </button>
         </div>
 
         <div className="rounded-lg shadow-lg p-6 bg-(--card)">
           {activeTab === 'nearby' && (
             <div>
               <h2 className="sm:text-2xl text-xl mb-2 font-bold text-(--foreground)">Queues Near You</h2>
-              <p className="mb-6 text-(--muted-foreground) text-xs sm:text-sm">Sorted by popularity</p>
+              <p className="mb-6 text-(--muted-foreground) text-xs sm:text-sm">Sorted by distance</p>
               <div className="space-y-4">
                 {nearbyQueues.length === 0 ? (
                   <p className="text-center py-8 text-(--muted-foreground)">No queues nearby</p>
@@ -437,75 +375,6 @@ const Dashboard = () => {
                     }
                     className="mt-4 w-full py-2 px-4 rounded-md font-medium transition-colors bg-(--primary) text-(--primary-foreground) hover:opacity-90 cursor-pointer">
                     Join Queue
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'create' && (
-            <div>
-              <h2 className="sm:text-2xl text-xl font-bold mb-2 text-(--foreground)">
-                Create a New Queue
-              </h2>
-
-              <p className="mb-6 text-(--muted-foreground) text-xs sm:text-sm">
-                Admin access required
-              </p>
-
-              <div className="flex flex-col items-center">
-                <div className='max-w-md w-full space-y-4'>
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-(--foreground)">
-                      Queue Name
-                    </label>
-
-                    <input
-                      type="text"
-                      value={newQueue.name}
-                      onChange={(e) =>
-                        setNewQueue({ ...newQueue, name: e.target.value })
-                      }
-                      placeholder="e.g., Hospital Registration"
-                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)"
-                      required />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-(--foreground)">
-                      Queue Key
-                    </label>
-
-                    <input
-                      value={newQueue.qKey}
-                      onChange={(e) =>
-                        setNewQueue({ ...newQueue, qKey: e.target.value })
-                      }
-                      placeholder="Create a Queue key"
-                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)"
-                      required />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-(--foreground)">
-                      Admin Key
-                    </label>
-
-                    <input
-                      type="password"
-                      value={newQueue.adminKey}
-                      onChange={(e) =>
-                        setNewQueue({ ...newQueue, adminKey: e.target.value })
-                      }
-                      placeholder="Enter your admin key"
-                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)"
-                      required />
-                  </div>
-
-                  <button
-                    onClick={handleCreateQueue}
-                    className="mt-4 w-full py-2 px-4 rounded-md font-medium transition-colors bg-(--primary) text-(--primary-foreground) hover:opacity-90 cursor-pointer">
-                    Create Queue
                   </button>
                 </div>
               </div>
