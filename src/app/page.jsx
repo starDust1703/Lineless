@@ -61,7 +61,7 @@ export default function Home() {
         <main className="min-h-screen flex flex-col bg-(--background)">
 
           <section className="mt-24 flex min-h-[60vh] flex-col items-center justify-center px-6 text-center lg:min-h-[70vh]">
-            <h1 className="p-3 text-3xl font-bold sm:text-4xl lg:text-6xl text-(--primary)">
+            <h1 className="p-3 text-2xl font-bold sm:text-4xl lg:text-6xl text-(--primary)">
               <TextType
                 text={["Lineless", "Queues, Without the Queue", "No Lines. No Chaos."]}
                 typingSpeed={75}

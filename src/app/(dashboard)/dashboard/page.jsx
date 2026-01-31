@@ -3,18 +3,20 @@ import React, { useState, useEffect } from 'react';
 import { MapPin, Users, Plus, LogIn, Clock, Navigation } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '../../../lib/supabase/client';
+import { useSearchParams } from 'next/navigation';
 
 const Dashboard = () => {
+  const searchParams = useSearchParams();
   const [user, setUser] = useState(null);
   const [nearbyQueues, setNearbyQueues] = useState([]);
   const [userQueues, setUserQueues] = useState([]);
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('nearby');
-  const [joinQueueKey, setJoinQueueKey] = useState('');
-  const [newQueue, setNewQueue] = useState({ name: '', adminKey: '', qKey: '' });
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [activeTab, setActiveTab] = useState(searchParams.get("tab") ?? "nearby");
+  const [joinQueueKey, setJoinQueueKey] = useState(searchParams.get("q") ?? "");
+  const [newQueue, setNewQueue] = useState({ name: "", adminKey: "", qKey: "" });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const supabase = createClient();
 
   useEffect(() => {

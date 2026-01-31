@@ -48,7 +48,7 @@ export default function UserHeader({ user }) {
     router.refresh();
   };
   const openCam = () => {
-
+    router.push("/qr-scan");
   }
 
   return (
