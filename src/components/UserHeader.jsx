@@ -44,9 +44,16 @@ export default function UserHeader({ user }) {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    setName(null);
-    router.refresh();
   };
+  useEffect(() => {
+    const { data: { subscription } } =
+      supabase.auth.onAuthStateChange((_event, session) => {
+        if (!session) router.replace('/login');
+      });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   const openCam = () => {
     router.push("/qr-scan");
   }
@@ -89,7 +96,7 @@ export default function UserHeader({ user }) {
                 </DropdownMenuItem>
                 <DropdownMenuItem className="flex gap-2 cursor-pointer hover:bg-(--muted)/70">
                   <button
-                    onClick={() => handleLogout()}
+                    onClick={handleLogout}
                     className="cursor-pointer">
                     Log Out
                   </button>

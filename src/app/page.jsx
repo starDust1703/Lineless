@@ -91,7 +91,7 @@ export default function Home() {
                 href="/about"
                 className="inline-flex w-full items-center justify-center rounded-lg border border-border px-6 py-3
                    text-(--foreground) transition
-                   hover:bg-(--muted) focus:outline-none focus:ring-4 focus:ring-(--ring)
+                   hover:bg-(--muted)/50 focus:outline-none focus:ring-4 focus:ring-(--ring)
                    sm:w-auto"
               >
                 About Us

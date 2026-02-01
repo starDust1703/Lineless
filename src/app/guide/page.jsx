@@ -1,21 +1,19 @@
 export default function GuidePage() {
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-200 px-6 py-16">
+    <main className="min-h-screen bg-(--background) text-(--foreground) px-6 py-16">
       <div className="mx-auto max-w-4xl space-y-20">
 
-        {/* Header */}
         <section className="space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight text-white">
+          <h1 className="text-4xl font-bold tracking-tight text-(--foreground)">
             Lineless Guide
           </h1>
-          <p className="text-neutral-400">
+          <p className="text-(--muted-foreground)">
             Everything you need to use Lineless. Nothing you don’t.
           </p>
         </section>
 
-        {/* For Organizers */}
         <section className="space-y-8">
-          <h2 className="text-2xl font-semibold text-white">
+          <h2 className="text-2xl font-semibold text-(--foreground)">
             For Queue Organizers
           </h2>
 
@@ -38,9 +36,8 @@ export default function GuidePage() {
           </div>
         </section>
 
-        {/* For Participants */}
         <section className="space-y-8">
-          <h2 className="text-2xl font-semibold text-white">
+          <h2 className="text-2xl font-semibold text-(--foreground)">
             For Participants
           </h2>
 
@@ -63,13 +60,12 @@ export default function GuidePage() {
           </div>
         </section>
 
-        {/* FAQ-lite */}
         <section className="space-y-6">
-          <h2 className="text-2xl font-semibold text-white">
+          <h2 className="text-2xl font-semibold text-(--foreground)">
             Good to Know
           </h2>
 
-          <ul className="space-y-4 text-neutral-300">
+          <ul className="space-y-4 text-(--muted-foreground)">
             <li>• QKeys are short and easy to share</li>
             <li>• UUIDs stay hidden in the backend</li>
             <li>• Old queues may expire automatically</li>
@@ -77,22 +73,22 @@ export default function GuidePage() {
           </ul>
         </section>
 
-        <section className="border-t border-neutral-800 pt-10 text-center space-y-4">
-          <p className="text-neutral-400">
+        <section className="border-t border-(--foreground)/80 pt-10 text-center space-y-4">
+          <p className="text-(--muted-foreground)">
             Still confused? The app is simpler than this page.
           </p>
 
           <div className="flex justify-center gap-4">
             <a
               href="/dashboard"
-              className="rounded-lg bg-white px-6 py-3 text-sm font-medium text-black hover:bg-neutral-200"
+              className="rounded-lg bg-(--foreground) px-6 py-3 text-sm font-medium text-(--background) hover:opacity-95"
             >
               Go to Dashboard
             </a>
 
             <a
               href="/dashboard"
-              className="rounded-lg border border-neutral-700 px-6 py-3 text-sm text-white hover:bg-neutral-900"
+              className="rounded-lg border border-(--foreground) px-6 py-3 text-sm text-(--foreground) hover:bg-(--foreground)/10"
             >
               Get Started
             </a>
@@ -105,16 +101,15 @@ export default function GuidePage() {
   );
 }
 
-/* Reusable Step Component */
 function Step({ number, title, desc }) {
   return (
     <div className="flex gap-4">
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-semibold text-black">
+      <div className="flex size-8 items-center justify-center rounded-full bg-(--foreground) text-sm font-semibold text-(--background)">
         {number}
       </div>
       <div className="space-y-1">
-        <h3 className="font-medium text-white">{title}</h3>
-        <p className="text-sm text-neutral-400">{desc}</p>
+        <h3 className="font-medium text-(--foreground)">{title}</h3>
+        <p className="text-sm text-(--muted-foreground)">{desc}</p>
       </div>
     </div>
   );

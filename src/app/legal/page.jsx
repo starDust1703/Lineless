@@ -1,34 +1,34 @@
 export default function LegalPage() {
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-200 px-6 py-16">
+    <main className="min-h-screen bg-(--background) text-(--foreground) px-6 py-16">
       <div className="mx-auto max-w-4xl space-y-16">
 
         {/* Header */}
         <section className="space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight text-white">
+          <h1 className="text-4xl font-bold tracking-tight">
             Legal
           </h1>
-          <p className="text-neutral-400">
+          <p className="text-(--muted-foreground)">
             Terms of Service & Privacy Policy
           </p>
-          <p className="text-neutral-500 text-sm">
+          <p className="text-(--foreground)/70 text-sm">
             Last updated: {new Date().toLocaleDateString()}
           </p>
         </section>
 
         {/* Quick Nav */}
-        <nav className="flex gap-6 text-sm text-neutral-400">
-          <a href="#terms" className="hover:text-white">
+        <nav className="flex gap-6 text-sm text-(--muted-foreground)/80">
+          <a href="#terms" className="hover:text-(--foreground)">
             Terms
           </a>
-          <a href="#privacy" className="hover:text-white">
+          <a href="#privacy" className="hover:text-(--foreground)">
             Privacy
           </a>
         </nav>
 
         {/* Terms of Service */}
         <section id="terms" className="space-y-6 scroll-mt-24">
-          <h2 className="text-2xl font-semibold text-white">
+          <h2 className="text-2xl font-semibold text-(--foreground)">
             Terms of Service
           </h2>
 
@@ -38,7 +38,7 @@ export default function LegalPage() {
             terms. If you don’t agree, don’t use the app.
           </p>
 
-          <ul className="list-disc list-inside space-y-2 text-neutral-300">
+          <ul className="list-disc list-inside space-y-2 text-(--foreground)/80">
             <li>Use Lineless only for legitimate queue management</li>
             <li>Do not abuse, spam, or manipulate queues</li>
             <li>Do not attempt to exploit or disrupt the system</li>
@@ -58,7 +58,7 @@ export default function LegalPage() {
 
         {/* Privacy Policy */}
         <section id="privacy" className="space-y-6 scroll-mt-24">
-          <h2 className="text-2xl font-semibold text-white">
+          <h2 className="text-2xl font-semibold text-(--foreground)">
             Privacy Policy
           </h2>
 
@@ -67,7 +67,7 @@ export default function LegalPage() {
             No unnecessary tracking.
           </p>
 
-          <ul className="list-disc list-inside space-y-2 text-neutral-300">
+          <ul className="list-disc list-inside space-y-2 text-(--foreground)/80">
             <li>Queue identifiers (UUIDs and QKeys)</li>
             <li>Queue timestamps and position</li>
             <li>Optional user identifiers if authentication is enabled</li>
@@ -85,9 +85,9 @@ export default function LegalPage() {
         </section>
 
         {/* Footer */}
-        <footer className="border-t border-neutral-800 pt-8 space-y-2 text-sm text-neutral-400">
+        <footer className="border-t border-(--muted-foreground) pt-8 space-y-2 text-sm text-(--foreground)">
           <p>
-            Contact: <span className="text-white">support@lineless.app</span>
+            Contact: <span className="text-(--foreground)">support@lineless.app</span>
           </p>
           <p>
             © {new Date().getFullYear()} Lineless

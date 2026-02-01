@@ -6,8 +6,6 @@ import { cn } from "../../../lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
-import ClickSpark from "../../../components/ui/ClickSpark";
-import AuthClientGuard from "../AuthClientGuard";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -37,14 +35,8 @@ export default function LoginForm() {
   };
 
   return (
-    <ClickSpark
-      sparkSize={10}
-      sparkRadius={15}
-      sparkCount={8}
-      duration={400}
-    >
-      <AuthClientGuard />
-      <div className="flex min-h-svh w-full bg items-center justify-center p-6 md:p-10">
+    <div>
+      <div className="flex min-h-svh w-full bg-(--background) items-center justify-center p-6 md:p-10">
         <div className={cn("flex flex-col gap-6")}>
           <Card>
             <CardHeader>
@@ -107,6 +99,6 @@ export default function LoginForm() {
           </Card>
         </div>
       </div>
-    </ClickSpark>
+    </div>
   );
 }

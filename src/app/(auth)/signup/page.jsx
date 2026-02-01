@@ -1,5 +1,4 @@
 "use client";
-import ClickSpark from "../../../components/ui/ClickSpark";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
 import { createClient } from "../../../lib/supabase/client";
 import { cn } from "../../../lib/utils";
@@ -7,13 +6,13 @@ import { Label } from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import AuthClientGuard from "../AuthClientGuard";
 
 export default function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
+  const [adminKey, setAdminKey] = useState("");
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -40,7 +39,7 @@ export default function SignUp() {
         },
       });
       if (error) throw error;
-      router.push("/sign-up-success");
+      router.push("/dashboard");
     } catch (error) {
       setError(error ? error.message : "An error occurred");
     } finally {
@@ -49,21 +48,15 @@ export default function SignUp() {
 
       await supabase.from('profiles').insert({
         id: user.id,
-        name
+        name,
+        admin_key: adminKey
       });
     }
   };
 
   return (
-    <ClickSpark
-      sparkColor='#fff'
-      sparkSize={10}
-      sparkRadius={15}
-      sparkCount={8}
-      duration={400}
-    >
-      <AuthClientGuard />
-      <div className="flex min-h-svh w-full bg items-center justify-center p-6 md:p-10">
+    <div>
+      <div className="flex min-h-svh w-full bg-(--background) items-center justify-center p-6 md:p-10">
         <div className={cn("flex flex-col w-80 gap-6")}>
           <Card>
             <CardHeader>
@@ -126,6 +119,18 @@ export default function SignUp() {
                       className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded outline-none focus:border-(--ring) focus:border-2"
                     />
                   </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="admin_key">Admin Key <span className="text-xs text-(--muted-foreground)">(optional)</span></Label>
+                    <input
+                      id="admin_key"
+                      type="text"
+                      title="Set your admin key to create queues"
+                      placeholder="Admin Key"
+                      value={adminKey}
+                      onChange={(e) => setAdminKey(e.target.value)}
+                      className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded outline-none focus:border-(--ring) focus:border-2"
+                    />
+                  </div>
                   {error && <p className="text-sm text-red-500">{error}</p>}
                   <button type="submit" className="px-4 py-2 rounded-md bg-(--foreground) text-(--background) font-bold text-md cursor-pointer hover:opacity-80 transition" disabled={isLoading}>
                     {isLoading ? "Creating an account..." : "Sign up"}
@@ -142,6 +147,6 @@ export default function SignUp() {
           </Card>
         </div>
       </div>
-    </ClickSpark>
+    </div>
   )
 }
