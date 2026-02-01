@@ -113,72 +113,38 @@ const Dashboard = () => {
       setError('');
       setSuccess('');
 
-      if (!newQueue.name) {
-        setError('Please enter a queue name');
-        return;
-      }
-      if (!newQueue.qKey) {
-        setError('Please enter a Queue key');
-        return;
-      }
-      if (newQueue.qKey.length > 16) {
-        setError('Queue key can be atmost 16 characters');
-        return;
-      }
-
-      // Verify admin key
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('admin_key')
-        .eq('id', user.id)
-        .single();
-
-      if (!profile?.admin_key || profile.admin_key !== newQueue.adminKey) {
-        setError('Invalid admin key');
-        return;
-      }
-
       if (!location) {
         setError('Location not available');
         return;
       }
 
-      // Create queue
-      const { data, error } = await supabase.from('queues').insert({
-        name: newQueue.name,
-        created_by: user.id,
-        q_key: newQueue.qKey,
-        latitude: location.latitude,
-        longitude: location.longitude,
-        population: 0
-      }).select().single();
+      const { data, error } = await supabase.rpc('create_queue', {
+        p_name: newQueue.name,
+        p_q_key: newQueue.qKey,
+        p_admin_key: newQueue.adminKey,
+        p_latitude: location.latitude,
+        p_longitude: location.longitude,
+      });
 
       if (error) throw error;
 
-      setUserQueues((prev) => [data, ...prev]);
+      setUserQueues(prev => [data, ...prev]);
       setActiveTab('manage');
-
       setSuccess('Queue created successfully!');
       setNewQueue({ name: '', adminKey: '', qKey: '' });
     } catch (err) {
-      setError('Failed to create queue');
+      setError(err.message ?? 'Failed to create queue');
     }
   };
 
   const handleDeleteQueue = async (queueId) => {
-    if (!queueId) throw new Error("Invalid queue id");
+    const { error } = await supabase.rpc('delete_queue', {
+      p_queue_id: queueId,
+    });
 
-    const { error } = await supabase
-      .from("queues")
-      .delete()
-      .eq("id", queueId)
-      .eq("created_by", user.id);
+    if (error) throw error;
 
-    if (error) {
-      console.error(error);
-      throw error;
-    }
-    setUserQueues((prev) => prev.filter((q) => q.id !== queueId));
+    setUserQueues(prev => prev.filter(q => q.id !== queueId));
   };
 
   const formatDateTime = (date = new Date()) => {
@@ -211,7 +177,7 @@ const Dashboard = () => {
       <div className="min-h-screen flex items-center justify-center bg-(--background)">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto border-(--muted-foreground)"></div>
-          <p className="mt-4 text-(--muted-foreground)">Loading dashboard...</p>
+          <p className="mt-4 text-(--muted-foreground)">Loading admin dashboard...</p>
         </div>
       </div>
     );

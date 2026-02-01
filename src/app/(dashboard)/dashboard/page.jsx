@@ -14,8 +14,6 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") ?? "nearby");
   const [joinQueueKey, setJoinQueueKey] = useState(searchParams.get("q") ?? "");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const supabase = createClient();
 
   useEffect(() => {
@@ -37,6 +35,16 @@ const Dashboard = () => {
         (payload) => {
           fetchUserQueues(user);
           if (location) fetchNearbyQueues(location);
+        }
+      ).on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'queues',
+        },
+        (payload) => {
+          fetchNearbyQueues(location);
         }
       )
       .subscribe();
@@ -70,7 +78,7 @@ const Dashboard = () => {
         );
       }
     } catch (err) {
-      setError('Failed to initialize dashboard');
+      toast.error("Failed to initialize dashboard");
       setLoading(false);
     }
   };
@@ -143,13 +151,7 @@ const Dashboard = () => {
     });
 
     if (error) throw error;
-
     setJoinQueueKey('');
-
-    // await Promise.all([
-    //   fetchNearbyQueues(location),
-    //   fetchUserQueues(user),
-    // ]);
 
     return res?.data?.name ?? null;
   };
@@ -160,11 +162,6 @@ const Dashboard = () => {
     });
 
     if (error) return console.error(error);
-
-    // await Promise.all([
-    //   fetchNearbyQueues(location),
-    //   fetchUserQueues(user),
-    // ]);
   };
 
   if (loading) {
@@ -178,6 +175,31 @@ const Dashboard = () => {
     );
   }
 
+  const formatDateTime = (date = new Date()) => {
+    const now = new Date();
+
+    const isToday =
+      date.getDate() === now.getDate() &&
+      date.getMonth() === now.getMonth() &&
+      date.getFullYear() === now.getFullYear();
+
+    const time = date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+
+    if (isToday) return `${time} · Today`;
+
+    const datePart = date.toLocaleDateString([], {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    });
+
+    return `${time} · ${datePart}`;
+  };
+
   return (
     <div className="min-h-[90vh] bg-(--background)">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -185,17 +207,6 @@ const Dashboard = () => {
           <h1 className="text-3xl text-(--foreground) font-bold mb-2 sm:text-4xl">LineLess Dashboard</h1>
           <p className="text-(--muted-foreground) text-sm sm:text-[16px]">Join in queues digitally</p>
         </div>
-
-        {error && (
-          <div className="mb-4 p-4 border rounded bg-(--destructive) text-(--destructive-foreground) border-(--destructive)">
-            {error}
-          </div>
-        )}
-        {success && (
-          <div className="mb-4 p-4 border rounded bg-(--success-bg) border-(--success) text-(--success)">
-            {success}
-          </div>
-        )}
 
         <div className="flex gap-2 mb-6 rounded-lg p-1 shadow bg-(--card) text-xs sm:text-[16px]">
           <button
@@ -300,7 +311,7 @@ const Dashboard = () => {
                             </span>
                             <span className="flex items-center gap-1">
                               <Clock className="w-4 h-4" />
-                              Joined {new Date(qm.joined_at).toLocaleTimeString()}
+                              Joined {formatDateTime(new Date(qm.joined_at))}
                             </span>
                           </div>
                         </div>
