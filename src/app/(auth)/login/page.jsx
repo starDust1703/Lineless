@@ -36,7 +36,7 @@ export default function LoginForm() {
 
   return (
     <div>
-      <div className="flex min-h-svh w-full bg-(--background) items-center justify-center p-6 md:p-10">
+      <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
         <div className={cn("flex flex-col gap-6")}>
           <Card>
             <CardHeader>

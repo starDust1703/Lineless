@@ -1,6 +1,6 @@
 export default function About() {
   return (
-    <main className="min-h-screen px-6 py-24 bg-(--background) text-(--foreground)">
+    <main className="min-h-screen px-6 py-24 text-(--foreground)">
       <div className="max-w-3xl mx-auto space-y-6">
         <h1 className="text-4xl font-bold">About Lineless</h1>
 

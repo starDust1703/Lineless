@@ -58,7 +58,7 @@ export default function Home() {
         sparkCount={8}
         duration={400}
       >
-        <main className="min-h-screen flex flex-col bg-(--background)">
+        <main className="min-h-screen flex flex-col">
 
           <section className="mt-24 flex min-h-[60vh] flex-col items-center justify-center px-6 text-center lg:min-h-[70vh]">
             <h1 className="p-3 text-2xl font-bold sm:text-4xl lg:text-6xl text-(--primary)">
@@ -103,7 +103,7 @@ export default function Home() {
             </p>
           </section>
 
-          <section className="py-24 px-6 text-center bg-(--background)">
+          <section className="py-24 px-6 text-center">
             <h2 className="mx-auto max-w-3xl text-4xl font-bold text-(--foreground) lg:text-5xl">
               Manage Queues Digitally. Keep Everything Moving.
             </h2>

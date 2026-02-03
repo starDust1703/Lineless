@@ -1,10 +1,13 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Users, Plus, Clock } from 'lucide-react';
+import { Users, Plus, Clock, UserRoundPen } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '../../../lib/supabase/client';
+import { useRouter } from 'next/navigation';
 
 const Dashboard = () => {
+  const supabase = createClient();
+  const router = useRouter();
   const [user, setUser] = useState(null);
   const [userQueues, setUserQueues] = useState([]);
   const [location, setLocation] = useState(null);
@@ -13,7 +16,6 @@ const Dashboard = () => {
   const [newQueue, setNewQueue] = useState({ name: "", adminKey: "", qKey: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const supabase = createClient();
 
   useEffect(() => {
     initializeDashboard();
@@ -174,7 +176,7 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-(--background)">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto border-(--muted-foreground)"></div>
           <p className="mt-4 text-(--muted-foreground)">Loading admin dashboard...</p>
@@ -184,7 +186,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-[90vh] bg-(--background)">
+    <div className="min-h-[90vh]">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl text-(--foreground) font-bold mb-2 sm:text-4xl">LineLess Admin</h1>
@@ -222,70 +224,6 @@ const Dashboard = () => {
         </div>
 
         <div className="rounded-lg shadow-lg p-6 bg-(--card)">
-          {activeTab === 'manage' && (
-            <div>
-              <h2 className="sm:text-2xl text-xl font-bold mb-2 text-(--foreground)">Manage Your Queues</h2>
-              <p className="mb-6 text-(--muted-foreground) text-xs sm:text-sm">Modify and Delete your Queues</p>
-              <div className="space-y-4">
-                {userQueues.length === 0 ? (
-                  <p className="text-center py-8 text-(--muted-foreground)">You haven't created any queue yet</p>
-                ) : (
-                  userQueues.map((queue) => (
-                    <div
-                      key={queue.id}
-                      className="border border-(--border) rounded-lg p-4 transition-shadow hover:shadow-md">
-                      <div className="flex justify-between items-start gap-4">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-lg font-semibold text-(--ring)">
-                            {queue.name}
-                          </h3>
-
-                          <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-(--muted-foreground)">
-                            <span className="flex items-center gap-1">
-                              <Users className="w-4 h-4" />
-                              {queue.population} total
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-4 h-4" />
-                              Created {formatDateTime(new Date(queue.created_at))}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                          <button
-                            onClick={() =>
-                              toast.promise(
-                                handleDeleteQueue(queue.id),
-                                {
-                                  loading: "Deleting...",
-                                  success: () => `Deleted ${queue.name}`,
-                                  error: "Error",
-                                }
-                              )
-                            }
-                            className="py-2 px-4 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 bg-(--destructive) text-(--destructive-foreground) cursor-pointer shadow-md hover:opacity-90"
-                          >
-                            Delete
-                          </button>
-
-                          <div className="text-right">
-                            <div className="text-2xl font-bold text-(--foreground)">
-                              {queue.population}
-                            </div>
-                            <div className="text-xs text-(--muted-foreground)">
-                              Members
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          )}
-
           {activeTab === 'create' && (
             <div>
               <h2 className="sm:text-2xl text-xl font-bold mb-2 text-(--foreground)">
@@ -351,6 +289,74 @@ const Dashboard = () => {
                     Create Queue
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'manage' && (
+            <div>
+              <h2 className="sm:text-2xl text-xl font-bold mb-2 text-(--foreground)">Manage Your Queues</h2>
+              <p className="mb-6 text-(--muted-foreground) text-xs sm:text-sm">Modify and Delete your Queues</p>
+              <div className="space-y-4">
+                {userQueues.length === 0 ? (
+                  <p className="text-center py-8 text-(--muted-foreground)">You haven't created any queue yet</p>
+                ) : (
+                  userQueues.map((queue) => (
+                    <div
+                      key={queue.id}
+                      className="border border-(--border) rounded-lg p-4 transition-shadow hover:shadow-md">
+                      <div className="flex justify-between items-start gap-4">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-lg font-semibold text-(--ring)">
+                            {queue.name}
+                          </h3>
+
+                          <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-(--muted-foreground)">
+                            <span className="flex items-center gap-1">
+                              <Users className="w-4 h-4" />
+                              {queue.population} total
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-4 h-4" />
+                              Created {formatDateTime(new Date(queue.created_at))}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                          {queue.population ?
+                            <button className='text-(--ring) cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-4xl' onClick={() => router.push(`/admin/${queue.q_key}`)}>
+                              <UserRoundPen />
+                            </button> :
+                            <button
+                              onClick={() =>
+                                toast.promise(
+                                  handleDeleteQueue(queue.id),
+                                  {
+                                    loading: "Deleting...",
+                                    success: () => `Deleted ${queue.name}`,
+                                    error: "Error",
+                                  }
+                                )
+                              }
+                              className="py-2 px-4 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 bg-(--destructive) text-(--destructive-foreground) cursor-pointer shadow-md hover:opacity-90"
+                            >
+                              Delete
+                            </button>
+                          }
+                          <div className="text-right">
+                            <div className="text-2xl font-bold text-(--foreground)">
+                              {queue.population}
+                            </div>
+                            <div className="text-xs text-(--muted-foreground)">
+                              Members
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           )}

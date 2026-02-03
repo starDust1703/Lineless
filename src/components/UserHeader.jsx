@@ -96,6 +96,13 @@ export default function UserHeader({ user }) {
                 </DropdownMenuItem>
                 <DropdownMenuItem className="flex gap-2 cursor-pointer hover:bg-(--muted)/70">
                   <button
+                    onClick={() => router.push(`${pathname == '/admin' ? '/dashboard' : '/admin'}`)}
+                    className="cursor-pointer">
+                    {pathname == '/dashboard' ? "Admin" : "Dashboard"}
+                  </button>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="flex gap-2 cursor-pointer hover:bg-(--muted)/70">
+                  <button
                     onClick={handleLogout}
                     className="cursor-pointer">
                     Log Out

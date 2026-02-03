@@ -1,6 +1,6 @@
 export default function LegalPage() {
   return (
-    <main className="min-h-screen bg-(--background) text-(--foreground) px-6 py-16">
+    <main className="min-h-screen text-(--foreground) px-6 py-16">
       <div className="mx-auto max-w-4xl space-y-16">
 
         {/* Header */}

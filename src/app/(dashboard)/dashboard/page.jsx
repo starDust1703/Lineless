@@ -166,7 +166,7 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-(--background)">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto border-(--muted-foreground)"></div>
           <p className="mt-4 text-(--muted-foreground)">Loading dashboard...</p>
@@ -201,7 +201,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-[90vh] bg-(--background)">
+    <div className="min-h-[90vh]">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl text-(--foreground) font-bold mb-2 sm:text-4xl">LineLess Dashboard</h1>
