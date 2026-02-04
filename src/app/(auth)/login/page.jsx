@@ -4,7 +4,6 @@ import { createClient } from "../../../lib/supabase/client";
 import { useState } from "react";
 import { cn } from "../../../lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
-import { Label } from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
 
 export default function LoginForm() {
@@ -49,7 +48,7 @@ export default function LoginForm() {
               <form onSubmit={handleLogin}>
                 <div className="flex flex-col gap-6">
                   <div className="grid gap-2">
-                    <Label htmlFor="email">Email</Label>
+                    <label htmlFor="email">Email</label>
                     <input
                       id="email"
                       type="email"
@@ -62,7 +61,7 @@ export default function LoginForm() {
                   </div>
                   <div className="grid gap-2">
                     <div className="flex items-center">
-                      <Label htmlFor="password">Password</Label>
+                      <label htmlFor="password">Password</label>
                       <Link
                         href="/forgot-password"
                         className="ml-auto inline-block text-sm underline-offset-4 hover:underline"

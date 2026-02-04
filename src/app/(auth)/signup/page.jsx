@@ -2,7 +2,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
 import { createClient } from "../../../lib/supabase/client";
 import { cn } from "../../../lib/utils";
-import { Label } from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -67,7 +66,7 @@ export default function SignUp() {
               <form onSubmit={handleSignUp}>
                 <div className="flex flex-col gap-6">
                   <div className="grid gap-2">
-                    <Label htmlFor="name">Name</Label>
+                    <label htmlFor="name">Name</label>
                     <input
                       id="name"
                       type="text"
@@ -81,7 +80,7 @@ export default function SignUp() {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="email">Email</Label>
+                    <label htmlFor="email">Email</label>
                     <input
                       id="email"
                       type="email"
@@ -94,7 +93,7 @@ export default function SignUp() {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="password">Password</Label>
+                    <label htmlFor="password">Password</label>
                     <input
                       id="password"
                       type="password"
@@ -107,7 +106,7 @@ export default function SignUp() {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="repeat-password">Repeat Password</Label>
+                    <label htmlFor="repeat-password">Repeat Password</label>
                     <input
                       id="repeat-password"
                       type="password"
@@ -120,7 +119,7 @@ export default function SignUp() {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="admin_key">Admin Key <span className="text-xs text-(--muted-foreground)">(optional)</span></Label>
+                    <label htmlFor="admin_key">Admin Key <span className="text-xs text-(--muted-foreground)">(optional)</span></label>
                     <input
                       id="admin_key"
                       type="text"

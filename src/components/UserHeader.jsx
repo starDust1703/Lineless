@@ -5,18 +5,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "../lib/supabase/client";
 import { useEffect, useState } from "react";
 import { ScanQrCode } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu";
+import Dropdown from "./ui/DropDown";
 
 export default function UserHeader({ user }) {
   const router = useRouter();
   const pathname = usePathname();
   const [name, setName] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
   const supabase = createClient();
 
   const scrollToFeatures = () => {
@@ -31,11 +26,12 @@ export default function UserHeader({ user }) {
   const fetchUser = async () => {
     const supabase = createClient();
 
-    const { data: { name } } = await supabase
+    const { data: { name, admin_key } } = await supabase
       .from('profiles')
-      .select('name')
+      .select('name, admin_key')
       .eq('id', user?.id)
       .single();
+    if (admin_key) setIsAdmin(true);
     setName(name);
   }
   useEffect(() => {
@@ -81,36 +77,22 @@ export default function UserHeader({ user }) {
             Guide
           </Link>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-(--border) bg-(--muted) text-sm font-semibold hover:bg-(--primary)/10 outline-none cursor-pointer"
-              >
-                {name && name[0]?.toUpperCase()}
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-content backdrop-blur-xl absolute top-2 -right-5 border-(--muted-foreground)/30" align="start">
-              <DropdownMenuGroup className="flex flex-col gap-1">
-                <DropdownMenuItem className="flex gap-2 cursor-pointer hover:bg-(--muted)/70">
-                  <span>{name}</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex gap-2 cursor-pointer hover:bg-(--muted)/70">
-                  <button
-                    onClick={() => router.push(`${pathname == '/admin' ? '/dashboard' : '/admin'}`)}
-                    className="cursor-pointer">
-                    {pathname == '/dashboard' ? "Admin" : "Dashboard"}
-                  </button>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex gap-2 cursor-pointer hover:bg-(--muted)/70">
-                  <button
-                    onClick={handleLogout}
-                    className="cursor-pointer">
-                    Log Out
-                  </button>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Dropdown
+            trigger={<button
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-(--border) bg-(--muted) text-sm font-semibold hover:bg-(--primary)/10 outline-none cursor-pointer"
+            >
+              {name && name[0]?.toUpperCase()}
+            </button>}
+            items={isAdmin ? [
+              { label: name },
+              {
+                label: (pathname == '/dashboard') ? "Admin" : "Dashboard", onClick: () => router.push(`${pathname == '/admin' ? '/dashboard' : '/admin'}`)
+              },
+              { label: "Log out", onClick: handleLogout },
+            ] :
+              [{ label: name },
+              { label: "Log out", onClick: handleLogout },]}
+          />
         </nav>
       </div>
     </header>
