@@ -201,6 +201,24 @@ const Dashboard = () => {
     return `${time} · ${datePart}`;
   };
 
+  const LiveDot = () => {
+    return (
+      <span className="relative flex h-3 w-3">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+        <span className="relative inline-flex rounded-full h-3 w-3 bg-red-600"></span>
+      </span>
+    );
+  };
+
+  const PausedDot = () => {
+    return (
+      <span className="relative flex h-3 w-3">
+        <span className="absolute inline-flex h-full w-full rounded-full bg-gray-400 opacity-40"></span>
+        <span className="relative inline-flex rounded-full h-3 w-3 bg-gray-500"></span>
+      </span>
+    );
+  };
+
   return (
     <div className="min-h-[90vh]">
       <UserHeader user={user} />
@@ -248,9 +266,12 @@ const Dashboard = () => {
                       key={queue.id}
                       className="border rounded-lg p-4 transition-shadow hover:shadow-md border-(--border)"
                     >
-                      <div className="flex justify-between items-start">
+                      <div className="flex justify-between items-center">
                         <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-(--ring)">{queue.name}</h3>
+                          <div className='flex gap-2 items-center'>
+                            {queue.live ? <LiveDot /> : <PausedDot />}
+                            <h3 className="text-lg font-semibold text-(--ring)">{queue.name}</h3>
+                          </div>
                           <div className="flex items-center gap-4 mt-2 text-sm text-(--muted-foreground)">
                             <span className="flex items-center gap-1">
                               <Users className="w-4 h-4" />
@@ -262,21 +283,22 @@ const Dashboard = () => {
                             </span>
                           </div>
                         </div>
-                        <button
-                          onClick={() =>
-                            toast.promise(
-                              handleJoinQueue(queue.id),
-                              {
-                                loading: "Joining...",
-                                success: () => `Joined ${queue.name} at position ${queue.population + 1}`,
-                                error: err => err.message,
-                              }
-                            )
-                          }
-                          className="px-4 py-2 rounded-md transition-colors bg-(--primary) text-(--primary-foreground) cursor-pointer hover:opacity-90"
-                        >
-                          Join
-                        </button>
+                        {queue.live ?
+                          <button
+                            onClick={() =>
+                              toast.promise(
+                                handleJoinQueue(queue.id),
+                                {
+                                  loading: "Joining...",
+                                  success: () => `Joined ${queue.name} at position ${queue.population + 1}`,
+                                  error: err => err.message,
+                                }
+                              )
+                            }
+                            className="px-4 py-2 rounded-md transition-colors bg-(--primary) text-(--primary-foreground) cursor-pointer hover:opacity-90"
+                          >
+                            Join
+                          </button> : <span className="px-4 py-2 rounded-md transition-colors bg-(--muted-foreground) text-(--primary-foreground) cursor-">Paused</span>}
                       </div>
                     </div>
                   ))
