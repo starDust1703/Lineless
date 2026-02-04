@@ -13,7 +13,7 @@ const Dashboard = () => {
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("create");
-  const [newQueue, setNewQueue] = useState({ name: "", adminKey: "", qKey: "" });
+  const [newQueue, setNewQueue] = useState({ name: "", qKey: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -123,7 +123,6 @@ const Dashboard = () => {
       const { data, error } = await supabase.rpc('create_queue', {
         p_name: newQueue.name,
         p_q_key: newQueue.qKey,
-        p_admin_key: newQueue.adminKey,
         p_latitude: location.latitude,
         p_longitude: location.longitude,
       });
@@ -133,7 +132,7 @@ const Dashboard = () => {
       setUserQueues(prev => [data, ...prev]);
       setActiveTab('manage');
       setSuccess('Queue created successfully!');
-      setNewQueue({ name: '', adminKey: '', qKey: '' });
+      setNewQueue({ name: '', qKey: '' });
     } catch (err) {
       setError(err.message ?? 'Failed to create queue');
     }
@@ -263,22 +262,6 @@ const Dashboard = () => {
                         setNewQueue({ ...newQueue, qKey: e.target.value })
                       }
                       placeholder="Create a Queue key"
-                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)"
-                      required />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-(--foreground)">
-                      Admin Key
-                    </label>
-
-                    <input
-                      type="password"
-                      value={newQueue.adminKey}
-                      onChange={(e) =>
-                        setNewQueue({ ...newQueue, adminKey: e.target.value })
-                      }
-                      placeholder="Enter your admin key"
                       className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)"
                       required />
                   </div>

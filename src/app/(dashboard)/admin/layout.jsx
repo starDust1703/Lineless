@@ -5,9 +5,9 @@ import { redirect } from "next/navigation";
 export default async function AdminLayout({ children }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  const {data} = await supabase.from('profiles').select('admin_key').eq('id', user.id).single();
+  const { data: { is_admin } } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single();
 
-  if (!data.admin_key) {
+  if (!is_admin) {
     redirect("/dashboard");
   }
 

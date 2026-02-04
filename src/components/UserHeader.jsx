@@ -26,12 +26,12 @@ export default function UserHeader({ user }) {
   const fetchUser = async () => {
     const supabase = createClient();
 
-    const { data: { name, admin_key } } = await supabase
+    const { data: { name, is_admin } } = await supabase
       .from('profiles')
-      .select('name, admin_key')
+      .select('name, is_admin')
       .eq('id', user?.id)
       .single();
-    if (admin_key) setIsAdmin(true);
+    if (is_admin) setIsAdmin(true);
     setName(name);
   }
   useEffect(() => {

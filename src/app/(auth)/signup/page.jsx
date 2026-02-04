@@ -11,7 +11,6 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
-  const [adminKey, setAdminKey] = useState("");
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -48,7 +47,6 @@ export default function SignUp() {
       await supabase.from('profiles').insert({
         id: user.id,
         name,
-        admin_key: adminKey
       });
     }
   };
@@ -118,18 +116,7 @@ export default function SignUp() {
                       className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded outline-none focus:border-(--ring) focus:border-2"
                     />
                   </div>
-                  <div className="grid gap-2">
-                    <label htmlFor="admin_key">Admin Key <span className="text-xs text-(--muted-foreground)">(optional)</span></label>
-                    <input
-                      id="admin_key"
-                      type="text"
-                      title="Set your admin key to create queues"
-                      placeholder="Admin Key"
-                      value={adminKey}
-                      onChange={(e) => setAdminKey(e.target.value)}
-                      className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded outline-none focus:border-(--ring) focus:border-2"
-                    />
-                  </div>
+
                   {error && <p className="text-sm text-red-500">{error}</p>}
                   <button type="submit" className="px-4 py-2 rounded-md bg-(--foreground) text-(--background) font-bold text-md cursor-pointer hover:opacity-80 transition" disabled={isLoading}>
                     {isLoading ? "Creating an account..." : "Sign up"}
