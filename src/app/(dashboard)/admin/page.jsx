@@ -10,15 +10,14 @@ const Dashboard = () => {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [userQueues, setUserQueues] = useState([]);
-  const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("create");
-  const [newQueue, setNewQueue] = useState({ name: "", qKey: "" });
+  const [newQueue, setNewQueue] = useState({ name: "", qKey: "", venue: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    initializeDashboard();
+    fetchUserQueues();
   }, []);
 
   useEffect(() => {
@@ -59,72 +58,81 @@ const Dashboard = () => {
     };
   }, [user]);
 
-  const initializeDashboard = async () => {
+  const fetchUserQueues = async () => {
     try {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const loc = {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude
-            };
-
-            const { data: { user } } = await supabase.auth.getUser();
-
-            setUser(user);
-            setLocation(loc);
-
-            if (user) {
-              await fetchUserQueues(user);
-            }
-
-            setLoading(false);
-          },
-          (error) => {
-            console.error('Location error:', error);
-            setLoading(false);
-          }
-        );
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      if (!user) {
+        setLoading(false);
+        return;
       }
 
+      const { data, error } = await supabase
+        .from('queues')
+        .select('*')
+        .eq('created_by', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setUserQueues(data || []);
+      setLoading(false);
     } catch (err) {
       setError('Failed to initialize dashboard');
       setLoading(false);
     }
   };
 
-  const fetchUserQueues = async (User) => {
-    try {
-      if (!User) return;
+  const getCurrLocation = () => {
+    return new Promise(
+      (resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject("Geolocation not supported");
+          return;
+        }
 
-      const { data, error } = await supabase
-        .from('queues')
-        .select('*')
-        .eq('created_by', User.id)
-        .order('created_at', { ascending: false });
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const loc = {
+              lat: position.coords.latitude,
+              lon: position.coords.longitude,
+            };
 
-      if (error) throw error;
-      setUserQueues(data || []);
-    } catch (err) {
-      console.error('Error fetching your queues:', err);
+            resolve(loc);
+          },
+          (error) => {
+            reject(error);
+          }
+        );
+      }
+    );
+  };
+
+  const getCoordinates = async (loc) => {
+    const res = await fetch(`/api/geocode?q=${encodeURIComponent(loc)}`);
+    const data = await res.json();
+    if (!data || data.length === 0) {
+      throw new Error("Invalid venue");
     }
+
+    return data?.[0];
   };
 
   const handleCreateQueue = async () => {
+    if (!newQueue.name || !newQueue.qKey) {
+      throw new Error("Queue name and key are required");
+    }
+
     try {
       setError('');
       setSuccess('');
 
-      if (!location) {
-        setError('Location not available');
-        return;
-      }
+      const { lat, lon } = (newQueue.venue ? await getCoordinates(newQueue.venue) : await getCurrLocation());
 
       const { data, error } = await supabase.rpc('create_queue', {
         p_name: newQueue.name,
         p_q_key: newQueue.qKey,
-        p_latitude: location.latitude,
-        p_longitude: location.longitude,
+        p_latitude: Number(lat),
+        p_longitude: Number(lon),
       });
 
       if (error) throw error;
@@ -132,7 +140,7 @@ const Dashboard = () => {
       setUserQueues(prev => [data, ...prev]);
       setActiveTab('manage');
       setSuccess('Queue created successfully!');
-      setNewQueue({ name: '', qKey: '' });
+      setNewQueue({ name: '', qKey: '', venue: '' });
     } catch (err) {
       setError(err.message ?? 'Failed to create queue');
     }
@@ -264,6 +272,18 @@ const Dashboard = () => {
                       placeholder="Create a Queue key"
                       className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)"
                       required />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-(--foreground)">
+                      Venue
+                    </label>
+
+                    <input
+                      value={newQueue.venue}
+                      onChange={(e) => setNewQueue({ ...newQueue, venue: e.target.value })}
+                      placeholder="Enter venue address (defaults to your location)"
+                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)" />
                   </div>
 
                   <button
