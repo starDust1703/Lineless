@@ -109,10 +109,12 @@ Built to remove chaos, not add features.
 
 ## Features
 - Light/Dark theme using next-themes
-- Authentication with role-based access (Admin / User)
+- Secure authentication with Admin & User roles
 - Create & join queues via Queue ID or QR code
-- Live queue position & population updates (Supabase Realtime)
+- Real-time queue updates using Supabase Realtime
 - Automatic FIFO position assignment
+- Live queue status control (open / paused)
+- Responsive, mobile-first UI
 
 ---
 
