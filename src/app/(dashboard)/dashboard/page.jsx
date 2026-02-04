@@ -4,6 +4,7 @@ import { MapPin, Users, LogIn, Clock, Navigation } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '../../../lib/supabase/client';
 import { useSearchParams } from 'next/navigation';
+import UserHeader from '../../../components/UserHeader';
 
 const Dashboard = () => {
   const searchParams = useSearchParams();
@@ -202,6 +203,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-[90vh]">
+      <UserHeader user={user} />
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl text-(--foreground) font-bold mb-2 sm:text-4xl">LineLess Dashboard</h1>
