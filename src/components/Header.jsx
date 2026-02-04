@@ -38,7 +38,7 @@ export default function Header() {
 
           <Link
             href="/login"
-            className="rounded-md border border-border px-3 py-1.5 text-(--foreground) hover:bg-(--muted)"
+            className="rounded-md border border-(--border) px-3 py-1.5 text-(--foreground) hover:bg-(--muted)"
           >
             Sign in
           </Link>
