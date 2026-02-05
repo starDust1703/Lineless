@@ -68,6 +68,7 @@ export default function SignUp() {
                     <input
                       id="name"
                       type="text"
+                      autoComplete="name"
                       pattern="[A-Za-z\s]+"
                       title="Only Latin letters allowed"
                       placeholder="Alice"
@@ -82,6 +83,7 @@ export default function SignUp() {
                     <input
                       id="email"
                       type="email"
+                      autoComplete="email"
                       title="Enter a valid email address"
                       placeholder="m@example.com"
                       required
@@ -118,7 +120,7 @@ export default function SignUp() {
                   </div>
 
                   {error && <p className="text-sm text-red-500">{error}</p>}
-                  <button type="submit" className="px-4 py-2 rounded-md bg-(--foreground) text-(--background) font-bold text-md cursor-pointer hover:opacity-80 transition" disabled={isLoading}>
+                  <button type="submit" className={`px-4 py-2 rounded-md bg-(--foreground) text-(--background) font-bold text-md hover:opacity-80 transition ${isLoading ? "cursor-not-allowed" : "cursor-pointer"}`} disabled={isLoading}>
                     {isLoading ? "Creating an account..." : "Sign up"}
                   </button>
                 </div>

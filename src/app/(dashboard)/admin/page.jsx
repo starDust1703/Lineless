@@ -117,7 +117,8 @@ const Dashboard = () => {
     return data?.[0];
   };
 
-  const handleCreateQueue = async () => {
+  const handleCreateQueue = async (e) => {
+    e.preventDefault();
     if (!newQueue.name || !newQueue.qKey) {
       throw new Error("Queue name and key are required");
     }
@@ -241,14 +242,15 @@ const Dashboard = () => {
                 Admin access required
               </p>
 
-              <div className="flex flex-col items-center">
+              <form onSubmit={handleCreateQueue} className="flex flex-col items-center">
                 <div className='max-w-md w-full space-y-4'>
                   <div>
-                    <label className="block text-sm font-medium mb-2 text-(--foreground)">
+                    <label htmlFor='qName' className="block text-sm font-medium mb-2 text-(--foreground)">
                       Queue Name
                     </label>
 
                     <input
+                      id='qName'
                       type="text"
                       value={newQueue.name}
                       onChange={(e) =>
@@ -260,11 +262,12 @@ const Dashboard = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2 text-(--foreground)">
+                    <label htmlFor='qKey' className="block text-sm font-medium mb-2 text-(--foreground)">
                       Queue Key
                     </label>
 
                     <input
+                      id='qKey'
                       value={newQueue.qKey}
                       onChange={(e) =>
                         setNewQueue({ ...newQueue, qKey: e.target.value })
@@ -275,11 +278,12 @@ const Dashboard = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2 text-(--foreground)">
+                    <label htmlFor='venue' className="block text-sm font-medium mb-2 text-(--foreground)">
                       Venue
                     </label>
 
                     <input
+                      id='venue'
                       value={newQueue.venue}
                       onChange={(e) => setNewQueue({ ...newQueue, venue: e.target.value })}
                       placeholder="Enter venue address (defaults to your location)"
@@ -287,12 +291,12 @@ const Dashboard = () => {
                   </div>
 
                   <button
-                    onClick={handleCreateQueue}
+                    type='submit'
                     className="mt-4 w-full py-2 px-4 rounded-md font-medium transition-colors bg-(--primary) text-(--primary-foreground) hover:opacity-90 cursor-pointer">
                     Create Queue
                   </button>
                 </div>
-              </div>
+              </form>
             </div>
           )}
 

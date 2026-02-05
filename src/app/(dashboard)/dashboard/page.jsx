@@ -35,7 +35,7 @@ const Dashboard = () => {
         },
         (payload) => {
           fetchUserQueues(user);
-          if (location) fetchNearbyQueues(location);
+          fetchNearbyQueues();
         }
       ).on(
         'postgres_changes',
@@ -45,7 +45,7 @@ const Dashboard = () => {
           table: 'queues',
         },
         (payload) => {
-          fetchNearbyQueues(location);
+          fetchNearbyQueues();
         }
       )
       .subscribe();
@@ -55,29 +55,39 @@ const Dashboard = () => {
     };
   }, [user, location]);
 
-  const initializeDashboard = async () => {
-    try {
-      if (navigator.geolocation) {
+  const getCurrLocation = () => {
+    return new Promise(
+      (resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject("Geolocation not supported");
+          return;
+        }
+
         navigator.geolocation.getCurrentPosition(
-          async (position) => {
+          (position) => {
             const loc = {
               latitude: position.coords.latitude,
-              longitude: position.coords.longitude
+              longitude: position.coords.longitude,
             };
 
-            const { data: { user } } = await supabase.auth.getUser();
-
-            setUser(user);
             setLocation(loc);
-            await Promise.all([fetchNearbyQueues(loc), fetchUserQueues(user)]);
-            setLoading(false);
+            resolve(loc);
           },
           (error) => {
-            console.error('Location error:', error);
-            setLoading(false);
+            reject(error);
           }
         );
       }
+    );
+  };
+
+  const initializeDashboard = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      setUser(user);
+      await Promise.all([fetchNearbyQueues(), fetchUserQueues(user)]);
+      setLoading(false);
     } catch (err) {
       toast.error("Failed to initialize dashboard");
       setLoading(false);
@@ -95,7 +105,7 @@ const Dashboard = () => {
     return R * c;
   };
 
-  const fetchNearbyQueues = async (loc) => {
+  const fetchNearbyQueues = async () => {
     try {
       const { data, error } = await supabase
         .from('queues')
@@ -104,6 +114,7 @@ const Dashboard = () => {
 
       if (error) throw error;
 
+      const loc = await getCurrLocation()
       const queuesWithDistance = data.map(queue => ({
         ...queue,
         distance: calculateDistance(
@@ -384,13 +395,24 @@ const Dashboard = () => {
                 Enter the QKey to join
               </p>
 
-              <div className="flex flex-col items-center">
+              <form onSubmit={(e) => {
+                e.preventDefault(),
+                  toast.promise(
+                    handleJoinQueue(),
+                    {
+                      loading: "Joining...",
+                      success: (res) => `Joined ${res || qm.queues.name}`,
+                      error: (err) => err.message,
+                    }
+                  )
+              }} className="flex flex-col items-center">
                 <div className='max-w-md w-full'>
-                  <label className="block text-sm font-medium mb-2 text-(--foreground)">
+                  <label htmlFor='qKey' className="block text-sm font-medium mb-2 text-(--foreground)">
                     Queue key
                   </label>
 
                   <input
+                    id='qKey'
                     type="text"
                     value={joinQueueKey}
                     onChange={(e) => setJoinQueueKey(e.target.value)}
@@ -398,21 +420,12 @@ const Dashboard = () => {
                     className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)" />
 
                   <button
-                    onClick={() =>
-                      toast.promise(
-                        handleJoinQueue(),
-                        {
-                          loading: "Joining...",
-                          success: (res) => `Joined ${res || qm.queues.name}`,
-                          error: (err) => err.message,
-                        }
-                      )
-                    }
+                    type='submit'
                     className="mt-4 w-full py-2 px-4 rounded-md font-medium transition-colors bg-(--primary) text-(--primary-foreground) hover:opacity-90 cursor-pointer">
                     Join Queue
                   </button>
                 </div>
-              </div>
+              </form>
             </div>
           )}
         </div>
