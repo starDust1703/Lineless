@@ -1,10 +1,11 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { MapPin, Users, LogIn, Clock, Navigation } from 'lucide-react';
+import { MapPin, Users, LogIn, Clock, Navigation, MapPinned } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '../../../lib/supabase/client';
 import { useSearchParams } from 'next/navigation';
 import UserHeader from '../../../components/UserHeader';
+import Link from 'next/link';
 
 const Dashboard = () => {
   const searchParams = useSearchParams();
@@ -142,12 +143,23 @@ const Dashboard = () => {
 
       const { data, error } = await supabase
         .from('queue_members')
-        .select('*, queues(name, population)')
+        .select('*, queues(name, population, live, latitude, longitude)')
         .eq('user_id', User.id)
         .order('position', { ascending: true });
 
       if (error) throw error;
-      setUserQueues((data || []).sort((a, b) => a.position - b.position));
+
+      const loc = await getCurrLocation()
+      const distIncluded = data.map(qm => ({
+        ...qm,
+        distance: calculateDistance(
+          loc.latitude,
+          loc.longitude,
+          qm.queues.latitude,
+          qm.queues.longitude
+        )
+      }));
+      setUserQueues(distIncluded);
     } catch (err) {
       console.error('Error fetching user queues:', err);
     }
@@ -174,6 +186,10 @@ const Dashboard = () => {
     });
 
     if (error) return console.error(error);
+
+    setUserQueues(prev =>
+      prev.filter(qm => qm.id !== qmId)
+    );
   };
 
   if (loading) {
@@ -332,17 +348,17 @@ const Dashboard = () => {
                       className="border border-(--border) rounded-lg p-4 transition-shadow hover:shadow-md">
                       <div className="flex justify-between items-start gap-4">
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-lg font-semibold text-(--ring)">
-                            {qm.queues.name}
-                          </h3>
+                          <div className='flex gap-2 items-center'>
+                            {qm.queues.live ? <LiveDot /> : <PausedDot />}
+                            <h3 className="text-lg font-semibold text-(--ring)">
+                              {qm.queues.name}
+                            </h3>
+                          </div>
 
                           <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-(--muted-foreground)">
-                            <span className="font-medium text-(--foreground)">
-                              Position: #{qm.position}
-                            </span>
                             <span className="flex items-center gap-1">
-                              <Users className="w-4 h-4" />
-                              {qm.queues.population} total
+                              <MapPin className="w-4 h-4" />
+                              {qm.distance?.toFixed(2)} km away
                             </span>
                             <span className="flex items-center gap-1">
                               <Clock className="w-4 h-4" />
@@ -352,6 +368,13 @@ const Dashboard = () => {
                         </div>
 
                         <div className="flex items-center gap-4">
+                          <Link
+                            href={`https://www.google.com/maps/dir/?api=1&destination=${qm.queues.latitude},${qm.queues.longitude}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className='text-(--ring) cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-4xl'>
+                            <MapPinned />
+                          </Link>
                           <button
                             onClick={() =>
                               toast.promise(
