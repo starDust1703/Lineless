@@ -86,7 +86,7 @@ export default function UserHeader({ user }) {
             items={isAdmin ? [
               { label: name },
               {
-                label: (pathname == '/dashboard') ? "Admin" : "Dashboard", onClick: () => router.push(`${pathname == '/admin' ? '/dashboard' : '/admin'}`)
+                label: (pathname == '/dashboard') ? "Admin" : "Dashboard", onClick: () => router.push(`${pathname == '/dashboard' ? '/admin' : '/dashboard'}`)
               },
               { label: "Log out", onClick: handleLogout },
             ] :

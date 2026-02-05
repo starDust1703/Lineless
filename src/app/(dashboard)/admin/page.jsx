@@ -262,6 +262,19 @@ const Dashboard = () => {
                   </div>
 
                   <div>
+                    <label htmlFor='venue' className="block text-sm font-medium mb-2 text-(--foreground)">
+                      Venue
+                    </label>
+
+                    <input
+                      id='venue'
+                      value={newQueue.venue}
+                      onChange={(e) => setNewQueue({ ...newQueue, venue: e.target.value })}
+                      placeholder="Enter venue address (defaults to your location)"
+                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)" />
+                  </div>
+
+                  <div>
                     <label htmlFor='qKey' className="block text-sm font-medium mb-2 text-(--foreground)">
                       Queue Key
                     </label>
@@ -275,19 +288,6 @@ const Dashboard = () => {
                       placeholder="Create a Queue key"
                       className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)"
                       required />
-                  </div>
-
-                  <div>
-                    <label htmlFor='venue' className="block text-sm font-medium mb-2 text-(--foreground)">
-                      Venue
-                    </label>
-
-                    <input
-                      id='venue'
-                      value={newQueue.venue}
-                      onChange={(e) => setNewQueue({ ...newQueue, venue: e.target.value })}
-                      placeholder="Enter venue address (defaults to your location)"
-                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)" />
                   </div>
 
                   <button
@@ -331,10 +331,10 @@ const Dashboard = () => {
                         </div>
 
                         <div className="flex items-center gap-4">
-                          {queue.population ?
-                            <button className='text-(--ring) cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-4xl' onClick={() => router.push(`/admin/${queue.q_key}`)}>
-                              <UserRoundPen />
-                            </button> :
+                          <button className='text-(--ring) cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-4xl' onClick={() => router.push(`/admin/${queue.q_key}`)}>
+                            <UserRoundPen />
+                          </button>
+                          {!queue.population &&
                             <button
                               onClick={() =>
                                 toast.promise(
