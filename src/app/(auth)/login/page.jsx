@@ -2,8 +2,6 @@
 import { useRouter } from "next/navigation";
 import { createClient } from "../../../lib/supabase/client";
 import { useState } from "react";
-import { cn } from "../../../lib/utils";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
 import Link from "next/link";
 
 export default function LoginForm() {
@@ -36,15 +34,13 @@ export default function LoginForm() {
   return (
     <div>
       <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-        <div className={cn("flex flex-col gap-6")}>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl">Login</CardTitle>
-              <CardDescription>
+        <div className="flex flex-col gap-6 rounded-xl bg-(--card) p-6 shadow transition hover:shadow-lg">
+          <div>
+            <h3 className="mb-1 text-2xl font-semibold">Login</h3>
+              <p className="text-sm text-(--muted-foreground)">
                 Enter your email below to login to your account
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </p>
+          </div>
               <form onSubmit={handleLogin}>
                 <div className="flex flex-col gap-6">
                   <div className="grid gap-2">
@@ -95,8 +91,6 @@ export default function LoginForm() {
                   </Link>
                 </div>
               </form>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>
