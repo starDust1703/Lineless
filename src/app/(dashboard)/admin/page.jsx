@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Users, Plus, Clock, UserRoundPen, QrCode, X, Download, Share2 } from 'lucide-react';
+import { Users, Plus, Clock, UserRoundPen, QrCode, X, Download, Share2, Trash2, TriangleAlert } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '../../../lib/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -14,9 +14,9 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("create");
   const [newQueue, setNewQueue] = useState({ name: "", venue: "" });
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [openQueueId, setOpenQueueId] = useState(false);
+  const [openQueueId, setOpenQueueId] = useState(null);
+  const [deleteQueueId, setDeleteQueueId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchUserQueues();
@@ -79,7 +79,7 @@ const AdminDashboard = () => {
       setUserQueues(data || []);
       setLoading(false);
     } catch (err) {
-      setError('Failed to initialize dashboard');
+      toast.error('Failed to initialize dashboard');
       setLoading(false);
     }
   };
@@ -127,16 +127,12 @@ const AdminDashboard = () => {
     return Array.from(arr, x => chars[x % chars.length]).join("");
   }
 
-  const handleCreateQueue = async (e) => {
-    e.preventDefault();
+  const handleCreateQueue = async () => {
     if (!newQueue.name) {
       throw new Error("Queue name is required");
     }
 
     try {
-      setError('');
-      setSuccess('');
-
       const { lat, lon } = (newQueue.venue ? await getCoordinates(newQueue.venue) : await getCurrLocation());
 
       const { data, error } = await supabase.rpc('create_queue', {
@@ -151,18 +147,21 @@ const AdminDashboard = () => {
 
       setUserQueues(prev => [data, ...prev]);
       setActiveTab('manage');
-      setSuccess('Queue created successfully!');
       setNewQueue({ name: '', venue: '' });
     } catch (err) {
-      setError(err.message ?? 'Failed to create queue');
+      toast.error(err.message ?? 'Failed to create queue');
     }
   };
 
   const handleDeleteQueue = async (queueId) => {
+    if (isDeleting) return;
+    setIsDeleting(true);
+
     const { error } = await supabase.rpc('delete_queue', {
       p_queue_id: queueId,
     });
 
+    setIsDeleting(false);
     if (error) throw error;
 
     setUserQueues(prev => prev.filter(q => q.id !== queueId));
@@ -260,16 +259,6 @@ const AdminDashboard = () => {
           <p className="text-(--muted-foreground) text-sm sm:text-[16px]">Manage your queues digitally</p>
         </div>
 
-        {error && (
-          <div className="mb-4 p-4 border rounded bg-(--destructive) text-(--destructive-foreground) border-(--destructive)">
-            {error}
-          </div>
-        )}
-        {success && (
-          <div className="mb-4 p-4 border rounded bg-(--success-bg) border-(--success) text-(--success)">
-            {success}
-          </div>
-        )}
         <div className='w-full flex justify-center'>
           <div className="flex gap-2 w-2xl mb-6 rounded-lg p-1 shadow bg-(--card) text-xs sm:text-[16px]">
             <button
@@ -301,7 +290,18 @@ const AdminDashboard = () => {
                 Admin access required
               </p>
 
-              <form onSubmit={handleCreateQueue} className="flex flex-col items-center">
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                toast.promise(
+                  handleCreateQueue(),
+                  {
+                    loading: "Creating...",
+                    success: () => `Created ${newQueue.name}`,
+                    error: "Error",
+                  }
+                )
+              }
+              } className="flex flex-col items-center">
                 <div className='max-w-md w-full space-y-4'>
                   <div>
                     <label htmlFor='qName' className="block text-sm font-medium mb-2 text-(--foreground)">
@@ -415,26 +415,62 @@ const AdminDashboard = () => {
                             }
                           />
 
-                          <button className='text-(--ring) cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-4xl' onClick={() => router.push(`/admin/${queue.q_key}`)}>
+                          <button className='text-(--ring) cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-full' onClick={() => router.push(`/admin/${queue.q_key}`)}>
                             <UserRoundPen />
                           </button>
-                          {!queue.population &&
-                            <button
-                              onClick={() =>
-                                toast.promise(
-                                  handleDeleteQueue(queue.id),
-                                  {
-                                    loading: "Deleting...",
-                                    success: () => `Deleted ${queue.name}`,
-                                    error: "Error",
-                                  }
-                                )
-                              }
-                              className="py-2 px-4 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 bg-(--destructive) text-(--destructive-foreground) cursor-pointer shadow-md hover:opacity-90"
-                            >
-                              Delete
-                            </button>
-                          }
+                          <button
+                            onClick={() => setDeleteQueueId(queue.id)}
+                            className='text-(--destructive) cursor-pointer hover:text-(--destructive)/70 outline-none'
+                          >
+                            <Trash2 />
+                          </button>
+
+                          <Modal
+                            open={deleteQueueId === queue.id}
+                            setOpen={() => setDeleteQueueId(null)}
+                            comp={
+                              <div className="w-full max-w-md space-y-5">
+
+                                <h2 className="text-xl font-semibold text-(--foreground)">
+                                  Delete this queue permanently?
+                                </h2>
+
+                                <div className="flex gap-3 rounded-lg border border-(--destructive)/40 bg-(--destructive)/10 p-3">
+                                  <TriangleAlert className="size-5 text-(--destructive) shrink-0 mt-0.5" />
+                                  <p className="text-sm leading-relaxed text-(--destructive)">
+                                    {queue.population
+                                      ? `This queue has ${queue.population} members. Deleting it will remove everyone and permanently erase the queue and its data. This cannot be undone.`
+                                      : `This queue will be permanently deleted. Any joins or history linked to it will be lost. This action cannot be undone.`}
+                                  </p>
+                                </div>
+
+                                <div className="flex gap-3 pt-2">
+                                  <button
+                                    className="flex-1 rounded-md border border-(--border) bg-(--muted)/40 px-4 py-2 text-sm font-medium hover:bg-(--muted) transition"
+                                    onClick={() => setDeleteQueueId(null)}
+                                  >
+                                    Cancel
+                                  </button>
+
+                                  <button
+                                    className="flex-1 rounded-md bg-(--destructive) px-4 py-2 text-sm font-semibold text-(--destructive-foreground) hover:bg-(--destructive)/90 transition disabled:opacity-60"
+                                    disabled={isDeleting}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+
+                                      toast.promise(handleDeleteQueue(queue.id).then(() => setDeleteQueueId(null)), {
+                                        loading: "Deleting...",
+                                        success: () => `Deleted ${queue.name}`,
+                                        error: (err) => err.message,
+                                      });
+                                    }}
+                                  >
+                                    {isDeleting ? "Deleting..." : "Delete"}
+                                  </button>
+                                </div>
+                              </div>
+                            }
+                          />
                           <div className="text-right">
                             <div className="text-2xl font-bold text-(--foreground)">
                               {queue.population}

@@ -338,15 +338,13 @@ const Dashboard = () => {
                         }}
                         comp={
                           <div>
-                            <div className='flex justify-between items-center mb-3'>
-                              <X
-                                className='text-(--foreground) cursor-pointer hover:text-(--foreground)/80 rounded-lg'
-                                onClick={() => {
-                                  setJoinQueue(null);
-                                  setJoinQueueKey("");
-                                }}
-                              />
-                            </div>
+                            <X
+                              className='text-(--foreground) cursor-pointer hover:text-(--foreground)/80 rounded-lg mb-3'
+                              onClick={() => {
+                                setJoinQueue(null);
+                                setJoinQueueKey("");
+                              }}
+                            />
                             <h2 className="mb-6 text-2xl font-semibold">
                               Enter Queue key for {queue.name}
                             </h2>
@@ -433,7 +431,7 @@ const Dashboard = () => {
                             href={`https://www.google.com/maps/dir/?api=1&destination=${qm.queues.latitude},${qm.queues.longitude}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className='text-(--ring) cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-4xl'>
+                            className='text-(--ring) cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-full'>
                             <MapPinned />
                           </Link>
                           <button
