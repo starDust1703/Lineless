@@ -1,9 +1,10 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Users, Plus, Clock, UserRoundPen } from 'lucide-react';
+import { Users, Plus, Clock, UserRoundPen, QrCode, X, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '../../../lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import Modal from '../../../components/ui/Modal';
 
 const AdminDashboard = () => {
   const supabase = createClient();
@@ -15,6 +16,7 @@ const AdminDashboard = () => {
   const [newQueue, setNewQueue] = useState({ name: "", qKey: "", venue: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [openQueueId, setOpenQueueId] = useState(false);
 
   useEffect(() => {
     fetchUserQueues();
@@ -183,6 +185,26 @@ const AdminDashboard = () => {
     return `${time} · ${datePart}`;
   };
 
+  const downloadQR = async (qrUrl, qKey) => {
+    try {
+      const res = await fetch(qrUrl);
+      const blob = await res.blob();
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${qKey}.png`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("QR download failed:", err);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -332,6 +354,45 @@ const AdminDashboard = () => {
                         </div>
 
                         <div className="flex items-center gap-4">
+                          <button className='text-(--muted-foreground) cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-lg outline-none' onClick={() => setOpenQueueId(queue.id)}>
+                            <QrCode />
+                          </button>
+                          <Modal
+                            open={openQueueId === queue.id}
+                            setOpen={() => setOpenQueueId(null)}
+                            comp={
+                              <div>
+                                <div className='flex justify-between items-center p-2 mb-3'>
+                                  <X
+                                    className='text-(--foreground) cursor-pointer hover:text-(--foreground)/80 rounded-lg'
+                                    onClick={() => setOpenQueueId(null)}
+                                  />
+
+                                  <Download
+                                    className='text-(--foreground) cursor-pointer hover:text-(--foreground)/80 rounded-lg'
+                                    onClick={() =>
+                                      downloadQR(
+                                        `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(queue.q_key)}`,
+                                        queue.q_key
+                                      )
+                                    }
+                                  />
+                                </div>
+
+                                <div className='flex justify-center p-4'>
+                                  <img
+                                    src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(queue.q_key)}`}
+                                    alt='qr-code'
+                                  />
+                                </div>
+
+                                <div className='flex justify-center text-xl font-semibold'>
+                                  <p>{queue.q_key}</p>
+                                </div>
+                              </div>
+                            }
+                          />
+
                           <button className='text-(--ring) cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-4xl' onClick={() => router.push(`/admin/${queue.q_key}`)}>
                             <UserRoundPen />
                           </button>
