@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Users, Plus, Clock, UserRoundPen, QrCode, X, Download } from 'lucide-react';
+import { Users, Plus, Clock, UserRoundPen, QrCode, X, Download, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '../../../lib/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -213,6 +213,34 @@ const AdminDashboard = () => {
     }
   };
 
+  const shareQR = async (qrUrl, qKey) => {
+    try {
+      const res = await fetch(qrUrl);
+      const blob = await res.blob();
+
+      const file = new File([blob], `${qKey}.png`, { type: "image/png" });
+
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({
+          title: "Join my queue",
+          text: `Scan to join queue: ${qKey}`,
+          files: [file],
+        });
+      } else if (navigator.share) {
+        await navigator.share({
+          title: "Join my queue",
+          text: `Scan to join queue: ${qKey}`,
+          url: qrUrl,
+        });
+      } else {
+        await navigator.clipboard.writeText(qrUrl);
+        alert("QR link copied to clipboard");
+      }
+    } catch (err) {
+      console.error("Share failed:", err);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -360,15 +388,17 @@ const AdminDashboard = () => {
                                     onClick={() => setOpenQueueId(null)}
                                   />
 
-                                  <Download
-                                    className='text-(--foreground) cursor-pointer hover:text-(--foreground)/80 rounded-lg'
-                                    onClick={() =>
-                                      downloadQR(
-                                        `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(queue.q_key)}`,
-                                        queue.q_key
-                                      )
-                                    }
-                                  />
+                                  <div className='flex gap-4'>
+                                    <Share2 className='text-(--foreground) cursor-pointer hover:text-(--foreground)/80 rounded-lg' onClick={() => shareQR(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(queue.q_key)}`, queue.q_key)} />
+                                    <Download
+                                      className='text-(--foreground) cursor-pointer hover:text-(--foreground)/80 rounded-lg'
+                                      onClick={() =>
+                                        downloadQR(
+                                          `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(queue.q_key)}`, queue.q_key
+                                        )
+                                      }
+                                    />
+                                  </div>
                                 </div>
 
                                 <div className='flex justify-center p-4'>
