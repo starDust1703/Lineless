@@ -169,10 +169,8 @@ export default function Queue() {
             <h3 className="text-(--ring) text-2xl font-bold">{queue.name}</h3>
             <p>Population: {queue.population}</p>
             <p>
-              Venue: {Math.f16round(queue.latitude)}, {Math.f16round(queue.longitude)}
-              {' '}(<span className="truncate inline-block max-w-40 align-bottom">{location}</span>)
+              Venue: <span className="truncate inline-block max-w-40 align-bottom">{location}</span>{' '}({Math.f16round(queue.latitude)}, {Math.f16round(queue.longitude)})
             </p>
-
           </div>
 
           <div className="flex gap-2">

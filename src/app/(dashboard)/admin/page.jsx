@@ -13,7 +13,7 @@ const AdminDashboard = () => {
   const [userQueues, setUserQueues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("create");
-  const [newQueue, setNewQueue] = useState({ name: "", qKey: "", venue: "" });
+  const [newQueue, setNewQueue] = useState({ name: "", venue: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [openQueueId, setOpenQueueId] = useState(false);
@@ -119,10 +119,18 @@ const AdminDashboard = () => {
     return data?.[0];
   };
 
+  const generateQKey = (len = 8) => {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const arr = new Uint8Array(len);
+    crypto.getRandomValues(arr);
+
+    return Array.from(arr, x => chars[x % chars.length]).join("");
+  }
+
   const handleCreateQueue = async (e) => {
     e.preventDefault();
-    if (!newQueue.name || !newQueue.qKey) {
-      throw new Error("Queue name and key are required");
+    if (!newQueue.name) {
+      throw new Error("Queue name is required");
     }
 
     try {
@@ -133,7 +141,7 @@ const AdminDashboard = () => {
 
       const { data, error } = await supabase.rpc('create_queue', {
         p_name: newQueue.name,
-        p_q_key: newQueue.qKey,
+        p_q_key: generateQKey(),
         p_latitude: Number(lat),
         p_longitude: Number(lon),
         p_loc_name: newQueue.venue || null
@@ -144,7 +152,7 @@ const AdminDashboard = () => {
       setUserQueues(prev => [data, ...prev]);
       setActiveTab('manage');
       setSuccess('Queue created successfully!');
-      setNewQueue({ name: '', qKey: '', venue: '' });
+      setNewQueue({ name: '', venue: '' });
     } catch (err) {
       setError(err.message ?? 'Failed to create queue');
     }
@@ -295,22 +303,6 @@ const AdminDashboard = () => {
                       onChange={(e) => setNewQueue({ ...newQueue, venue: e.target.value })}
                       placeholder="Enter venue address (defaults to your location)"
                       className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)" />
-                  </div>
-
-                  <div>
-                    <label htmlFor='qKey' className="block text-sm font-medium mb-2 text-(--foreground)">
-                      Queue Key
-                    </label>
-
-                    <input
-                      id='qKey'
-                      value={newQueue.qKey}
-                      onChange={(e) =>
-                        setNewQueue({ ...newQueue, qKey: e.target.value })
-                      }
-                      placeholder="Create a Queue key"
-                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)"
-                      required />
                   </div>
 
                   <button
