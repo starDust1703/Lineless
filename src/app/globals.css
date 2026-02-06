@@ -10,12 +10,12 @@
   --muted: hsl(210 30% 98%);
   --muted-foreground: hsl(215 15% 45%);
 
-  --card: hsl(115, 83%, 86%);
+  --card: hsl(162, 87%, 94%);
   --card-foreground: hsl(223 11% 25%);
 
   --border: hsl(215 20% 90%);
   --input: hsl(210 24% 96%);
-  --ring: hsl(174 64% 36%);
+  --ring: hsl(174, 64%, 29%);
 
   --destructive: hsl(348 87% 55%);
   --destructive-foreground: hsl(0 0% 100%);

@@ -11,6 +11,19 @@ export default function Queue() {
   const [queue, setQueue] = useState(null);
   const [queueMems, setQueueMems] = useState([]);
   const [loading, setloading] = useState(true);
+  const [location, setLocation] = useState("Unknown Location");
+
+  const getLocName = async (lat, lon) => {
+    const res = await fetch(`/api/geoloc?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`);
+    const data = await res.json();
+    if (!data || data.length === 0) {
+      throw new Error("Unknown Location");
+    }
+
+    setLocation(data?.name || data?.display_name);
+
+    return data;
+  };
 
   const getQueue = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -26,9 +39,11 @@ export default function Queue() {
       router.replace('/not-found');
       return;
     }
-    fetchQueueMembers(data);
-
     setQueue(data);
+
+    fetchQueueMembers(data);
+    if (data.loc_name) setLocation(data.loc_name);
+    else getLocName(data.latitude, data.longitude);
   }
 
   useEffect(() => {
@@ -151,9 +166,13 @@ export default function Queue() {
 
         <div className="flex justify-between items-center">
           <div>
-            <p className="text-(--ring) text-2xl font-bold">{queue.name}</p>
-            <div>Population: {queue.population}</div>
-            <div>Venue: {Math.f16round(queue.latitude)}, {Math.f16round(queue.longitude)}</div>
+            <h3 className="text-(--ring) text-2xl font-bold">{queue.name}</h3>
+            <p>Population: {queue.population}</p>
+            <p>
+              Venue: {Math.f16round(queue.latitude)}, {Math.f16round(queue.longitude)}
+              {' '}(<span className="truncate inline-block max-w-40 align-bottom">{location}</span>)
+            </p>
+
           </div>
 
           <div className="flex gap-2">

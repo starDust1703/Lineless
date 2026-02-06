@@ -70,12 +70,14 @@ export default function UserHeader({ user }) {
             <ScanQrCode size={18} />
           </button>
           <ThemeSwitcher />
-          <button onClick={scrollToFeatures} className="hover:text-(--foreground) cursor-pointer">
-            Features
-          </button>
-          <Link href="/guide" className="hover:text-(--foreground)">
-            Guide
-          </Link>
+          <div className="not-sm:hidden flex gap-4">
+            <button onClick={scrollToFeatures} className="hover:text-(--foreground) cursor-pointer">
+              Features
+            </button>
+            <Link href="/guide" className="hover:text-(--foreground)">
+              Guide
+            </Link>
+          </div>
 
           <Dropdown
             trigger={<button

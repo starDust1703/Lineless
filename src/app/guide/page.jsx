@@ -104,7 +104,7 @@ export default function GuidePage() {
 function Step({ number, title, desc }) {
   return (
     <div className="flex gap-4">
-      <div className="flex size-8 items-center justify-center rounded-full bg-(--foreground) text-sm font-semibold text-(--background)">
+      <div className="flex shrink-0 size-8 items-center justify-center rounded-full bg-(--foreground) text-sm font-semibold text-(--background)">
         {number}
       </div>
       <div className="space-y-1">

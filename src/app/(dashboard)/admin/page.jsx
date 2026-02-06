@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { createClient } from '../../../lib/supabase/client';
 import { useRouter } from 'next/navigation';
 
-const Dashboard = () => {
+const AdminDashboard = () => {
   const supabase = createClient();
   const router = useRouter();
   const [user, setUser] = useState(null);
@@ -134,6 +134,7 @@ const Dashboard = () => {
         p_q_key: newQueue.qKey,
         p_latitude: Number(lat),
         p_longitude: Number(lon),
+        p_loc_name: newQueue.venue || null
       });
 
       if (error) throw error;
@@ -373,4 +374,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default AdminDashboard;

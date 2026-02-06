@@ -255,27 +255,27 @@ const Dashboard = () => {
           <p className="text-(--muted-foreground) text-sm sm:text-[16px]">Join in queues digitally</p>
         </div>
 
-        <div className="flex gap-2 mb-6 rounded-lg p-1 shadow bg-(--card) text-xs sm:text-[16px]">
+        <div className="flex gap-2 mb-6 rounded-lg p-1 shadow bg-(--card) text-xs sm:text-[16px] overflow-x-auto">
           <button
             onClick={() => setActiveTab('nearby')}
-            className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer flex items-center justify-center ${activeTab === 'nearby' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
+            className={`flex-1 w-80 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer flex items-center justify-center ${activeTab === 'nearby' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
           >
             <Navigation className="inline w-4 h-4 mr-2" />
-            <div>Nearby Queues</div>
+            <div className='min-w-30'>Nearby Queues</div>
           </button>
           <button
             onClick={() => setActiveTab('my-queues')}
             className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer flex items-center justify-center ${activeTab === 'my-queues' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
           >
             <Clock className="inline w-4 h-4 mr-2" />
-            <div>My Queues</div>
+            <div className='min-w-30'>My Queues</div>
           </button>
           <button
             onClick={() => setActiveTab('join')}
             className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer flex items-center justify-center ${activeTab === 'join' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
           >
             <LogIn className="inline w-4 h-4 mr-2" />
-            <div>Join Queue</div>
+            <div className='min-w-30'>Join Queue</div>
           </button>
         </div>
 
@@ -361,13 +361,13 @@ const Dashboard = () => {
                               {qm.distance?.toFixed(2)} km away
                             </span>
                             <span className="flex items-center gap-1">
-                              <Clock className="w-4 h-4" />
+                              <Clock className="w-4 h-4 self-start sm:self-center" />
                               Joined {formatDateTime(new Date(qm.joined_at))}
                             </span>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-end gap-4 sm:flex-row sm:items-center flex-col-reverse">
                           <Link
                             href={`https://www.google.com/maps/dir/?api=1&destination=${qm.queues.latitude},${qm.queues.longitude}`}
                             target="_blank"
