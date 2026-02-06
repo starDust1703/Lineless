@@ -54,8 +54,8 @@ export default function SignUp() {
       <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
         <div className="flex flex-col w-80 gap-6 rounded-xl bg-(--card) p-6 shadow transition hover:shadow-lg">
           <div>
-          <h3 className="mb-1 text-2xl font-semibold">Sign up</h3>
-          <p className="text-sm text-(--muted-foreground)">Create a new account</p>
+            <h3 className="mb-1 text-2xl font-semibold">Sign up</h3>
+            <p className="text-sm text-(--muted-foreground)">Create a new account</p>
           </div>
           <form onSubmit={handleSignUp}>
             <div className="flex flex-col gap-6">

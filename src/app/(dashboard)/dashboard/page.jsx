@@ -1,11 +1,12 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { MapPin, Users, LogIn, Clock, Navigation, MapPinned } from 'lucide-react';
+import { MapPin, Users, LogIn, Clock, Navigation, MapPinned, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '../../../lib/supabase/client';
 import { useSearchParams } from 'next/navigation';
 import UserHeader from '../../../components/UserHeader';
 import Link from 'next/link';
+import Modal from '../../../components/ui/Modal';
 
 const Dashboard = () => {
   const searchParams = useSearchParams();
@@ -15,6 +16,8 @@ const Dashboard = () => {
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") ?? "nearby");
+  const [joinQueue, setJoinQueue] = useState(null);
+  const [isJoining, setIsJoining] = useState(false);
   const [joinQueueKey, setJoinQueueKey] = useState(searchParams.get("q") ?? "");
   const supabase = createClient();
 
@@ -54,32 +57,24 @@ const Dashboard = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, location]);
+  }, [user]);
 
   const getCurrLocation = () => {
-    return new Promise(
-      (resolve, reject) => {
-        if (!navigator.geolocation) {
-          reject("Geolocation not supported");
-          return;
-        }
+    if (location) return Promise.resolve(location);
 
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const loc = {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            };
-
-            setLocation(loc);
-            resolve(loc);
-          },
-          (error) => {
-            reject(error);
-          }
-        );
-      }
-    );
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const loc = {
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+          };
+          setLocation(loc);
+          resolve(loc);
+        },
+        reject
+      );
+    });
   };
 
   const initializeDashboard = async () => {
@@ -166,18 +161,34 @@ const Dashboard = () => {
   };
 
   const handleJoinQueue = async (queueId) => {
-    const res = (!queueId) ? await supabase.from('queues').select('*').eq('q_key', joinQueueKey).single() : null;
+    if (isJoining) return;
+    setIsJoining(true);
 
-    if (!queueId && !res?.data) throw new Error("Please enter a valid queue key");
+    try {
+      let queueName = null;
+      let qId = queueId;
 
-    const { error } = await supabase.rpc('join_queue', {
-      q_id: queueId || res?.data.id
-    });
+      if (!qId) {
+        const { data, error } = await supabase
+          .from('queues')
+          .select('id, name')
+          .eq('q_key', joinQueueKey)
+          .single();
 
-    if (error) throw error;
-    setJoinQueueKey('');
+        if (error || !data) throw new Error("Please enter a valid queue key");
 
-    return res?.data?.name ?? null;
+        qId = data.id;
+        queueName = data.name;
+      }
+
+      const { error } = await supabase.rpc('join_queue', { q_id: qId });
+      if (error) throw error;
+
+      setJoinQueueKey('');
+      return queueName ?? "queue";
+    } finally {
+      setIsJoining(false);
+    }
   };
 
   const handleLeaveQueue = async (qmId) => {
@@ -312,7 +323,39 @@ const Dashboard = () => {
                         </div>
                         {queue.live ?
                           <button
-                            onClick={() =>
+                            onClick={() => setJoinQueue(queue)}
+                            className="px-4 py-2 rounded-md transition-colors bg-(--primary) text-(--primary-foreground) cursor-pointer hover:opacity-90 outline-none"
+                          >
+                            Join
+                          </button> :
+                          <span className="px-4 py-2 rounded-md transition-colors bg-(--muted-foreground) text-(--primary-foreground) cursor-default">Paused</span>}
+                      </div>
+                      <Modal
+                        open={joinQueue === queue}
+                        setOpen={() => {
+                          setJoinQueue(null);
+                          setJoinQueueKey("");
+                        }}
+                        comp={
+                          <div>
+                            <div className='flex justify-between items-center mb-3'>
+                              <X
+                                className='text-(--foreground) cursor-pointer hover:text-(--foreground)/80 rounded-lg'
+                                onClick={() => {
+                                  setJoinQueue(null);
+                                  setJoinQueueKey("");
+                                }}
+                              />
+                            </div>
+                            <h2 className="mb-6 text-2xl font-semibold">
+                              Enter Queue key for {queue.name}
+                            </h2>
+                            <form onSubmit={(e) => {
+                              e.preventDefault();
+                              if (joinQueueKey != queue.q_key) {
+                                return toast.error("Queue key does not match");
+                              }
+                              setJoinQueue(null);
                               toast.promise(
                                 handleJoinQueue(queue.id),
                                 {
@@ -321,12 +364,30 @@ const Dashboard = () => {
                                   error: err => err.message,
                                 }
                               )
-                            }
-                            className="px-4 py-2 rounded-md transition-colors bg-(--primary) text-(--primary-foreground) cursor-pointer hover:opacity-90"
-                          >
-                            Join
-                          </button> : <span className="px-4 py-2 rounded-md transition-colors bg-(--muted-foreground) text-(--primary-foreground) cursor-">Paused</span>}
-                      </div>
+                              setJoinQueueKey("");
+                            }} className='flex flex-col items-center justify-center'>
+                              <div className='w-80 flex flex-col gap-6'>
+                                <div className="grid gap-2">
+                                  <label htmlFor="name">Queue key</label>
+                                  <input
+                                    id="name"
+                                    type="text"
+                                    placeholder="Enter queue key here"
+                                    required
+                                    value={joinQueueKey}
+                                    autoComplete='off'
+                                    onChange={(e) => setJoinQueueKey(e.target.value)}
+                                    className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded outline-none focus:border-(--ring) focus:border-2 w-full"
+                                  />
+                                </div>
+                                <button type="submit" className={`px-4 py-2 rounded-md bg-(--foreground) text-(--background) font-bold text-md hover:opacity-80 transition w-full ${isJoining ? "cursor-not-allowed" : "cursor-pointer"}`} disabled={isJoining}>
+                                  {isJoining ? "Joining..." : "Join"}
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                        }
+                      />
                     </div>
                   ))
                 )}
@@ -424,7 +485,7 @@ const Dashboard = () => {
                     handleJoinQueue(),
                     {
                       loading: "Joining...",
-                      success: (res) => `Joined ${res || qm.queues.name}`,
+                      success: (res) => `Joined ${res || "queue"}`,
                       error: (err) => err.message,
                     }
                   )
