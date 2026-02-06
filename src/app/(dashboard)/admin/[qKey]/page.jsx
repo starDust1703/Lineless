@@ -157,46 +157,94 @@ export default function Queue() {
   }
 
   return queue ? (
-    <div className="min-h-[90vh]">
+    <div className="min-h-[90vh] bg-(--background)">
       <div className="max-w-7xl mx-auto px-4 py-8">
+
         <div className="mb-8">
-          <h1 className="text-3xl text-(--foreground) font-bold mb-2 sm:text-4xl">LineLess Queue</h1>
-          <p className="text-(--muted-foreground) text-sm sm:text-[16px]">Manage your queues digitally</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-(--foreground)">
+            LineLess Queue
+          </h1>
+          <p className="text-(--muted-foreground) text-sm sm:text-base">
+            Manage your queues digitally
+          </p>
         </div>
 
-        <div className="flex justify-between items-center">
-          <div>
-            <h3 className="text-(--ring) text-2xl font-bold">{queue.name}</h3>
-            <p>Population: {queue.population}</p>
-            <p>
-              Venue: <span className="truncate inline-block max-w-40 align-bottom">{location}</span>{' '}({Math.f16round(queue.latitude)}, {Math.f16round(queue.longitude)})
-            </p>
-          </div>
+        <div className="rounded-2xl border border-(--border) bg-(--card) p-5 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-3">
+                <h3 className="text-2xl font-bold text-(--foreground)">
+                  {queue.name}
+                </h3>
 
-          <div className="flex gap-2">
-            <button className="p-2 cursor-pointer hover:bg-(--muted)/70 rounded-lg" onClick={() => toggleStatus()}>
-              {queue.live ? "Pause" : "Resume"}
-            </button>
+                <span
+                  className={`text-xs px-2 py-1 rounded-md font-medium
+              ${queue.live
+                      ? "bg-green-500/15 text-green-500"
+                      : "bg-yellow-500/15 text-yellow-500"}`}
+                >
+                  {queue.live ? "LIVE" : "PAUSED"}
+                </span>
+              </div>
 
-            {queueMems.length ?
-              <button className="p-2 cursor-pointer hover:bg-(--muted)/70 rounded-lg" onClick={() => callNext()}>Next</button>
-              : null
-            }
+              <p className="text-sm text-(--muted-foreground)">
+                Population: <span className="text-(--foreground) font-medium">{queue.population}</span>
+              </p>
+
+              <p className="text-sm text-(--muted-foreground)">
+                Venue:
+                <span className="truncate inline-block max-w-44 align-bottom ml-1 text-(--foreground)">
+                  {location}
+                </span>
+                {" "}({Math.f16round(queue.latitude)}, {Math.f16round(queue.longitude)})
+              </p>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={toggleStatus}
+                className="px-4 py-2 rounded-lg text-sm font-medium
+              bg-(--muted) hover:bg-(--muted)/70
+              transition active:scale-[0.97]"
+              >
+                {queue.live ? "Pause" : "Resume"}
+              </button>
+
+              {queueMems.length > 0 && (
+                <button
+                  onClick={callNext}
+                  className="px-4 py-2 rounded-lg text-sm font-medium
+                bg-(--ring) text-white
+                hover:opacity-90 transition active:scale-[0.97]"
+                >
+                  Next
+                </button>
+              )}
+            </div>
           </div>
         </div>
-        {queueMems.length ?
-          <div className="mt-6">
-            <h2 className="text-lg font-semibold text-(--foreground) mb-3">
-              Queue Members
-            </h2>
 
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold text-(--foreground) mb-3">
+            Queue Members
+          </h2>
+
+          {queueMems.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-(--border) p-8 text-center text-(--muted-foreground)">
+              No one in queue. Peaceful. Suspiciously peaceful.
+            </div>
+          ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+
               {queueMems.map((qm, index) => (
                 <div
                   key={qm.id}
-                  className="rounded-lg border border-(--border) bg-(--card) p-4 flex flex-col gap-1"
+                  className="rounded-xl border border-(--border)
+                bg-(--card) p-4 flex flex-col gap-1
+                hover:shadow-md hover:border-(--ring)/40
+                transition"
                 >
-                  <div className="text-sm text-(--muted-foreground)">
+                  <div className="text-xs text-(--muted-foreground)">
                     Position #{index + 1}
                   </div>
 
@@ -209,11 +257,13 @@ export default function Queue() {
                   </div>
                 </div>
               ))}
+
             </div>
-          </div>
-          : null}
+          )}
+        </div>
 
       </div>
     </div>
+
   ) : null;
-}
+};
