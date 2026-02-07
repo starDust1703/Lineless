@@ -30,7 +30,7 @@ export default function Dropdown({ trigger, items }) {
                 item.onClick?.();
                 setOpen(false);
               }}
-              className="w-full px-4 py-2 text-left cursor-pointer hover:bg-(--muted)/70 rounded-lg relative flex select-none items-center gap-2 text-sm outline-none transition-colors"
+              className="w-full px-4 py-2 text-left cursor-pointer hover:bg-(--muted)/70 rounded-lg relative flex select-none items-center gap-2 text-sm transition-colors"
             >
               {item.label}
             </button>

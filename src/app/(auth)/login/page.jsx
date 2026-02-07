@@ -37,60 +37,60 @@ export default function LoginForm() {
         <div className="flex flex-col gap-6 rounded-xl bg-(--card) p-6 shadow transition hover:shadow-lg">
           <div>
             <h3 className="mb-1 text-2xl font-semibold">Login</h3>
-              <p className="text-sm text-(--muted-foreground)">
-                Enter your email below to login to your account
-              </p>
+            <p className="text-sm text-(--muted-foreground)">
+              Enter your email below to login to your account
+            </p>
           </div>
-              <form onSubmit={handleLogin}>
-                <div className="flex flex-col gap-6">
-                  <div className="grid gap-2">
-                    <label htmlFor="email">Email</label>
-                    <input
-                      id="email"
-                      type="email"
-                      autoComplete="email"
-                      placeholder="m@example.com"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded outline-none focus:border-(--ring) focus:border-2"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <div className="flex items-center">
-                      <label htmlFor="password">Password</label>
-                      <Link
-                        href="/forgot-password"
-                        className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                      >
-                        Forgot your password?
-                      </Link>
-                    </div>
-                    <input
-                      id="password"
-                      type="password"
-                      placeholder="Password"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded outline-none focus:border-(--ring) focus:border-2"
-                    />
-                  </div>
-                  {error && <p className="text-sm text-red-500">{error}</p>}
-                  <button type="submit" className={`px-4 py-2 rounded-md bg-(--foreground) text-(--background) font-bold text-md hover:opacity-80 transition ${isLoading ? "cursor-not-allowed" : "cursor-pointer"}`} disabled={isLoading}>
-                    {isLoading ? "Logging in..." : "Login"}
-                  </button>
-                </div>
-                <div className="mt-4 text-center text-sm">
-                  Don&apos;t have an account?{" "}
+          <form onSubmit={handleLogin}>
+            <div className="flex flex-col gap-6">
+              <div className="grid gap-2">
+                <label htmlFor="email">Email</label>
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="m@example.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded focus:border-(--ring) focus:border-2"
+                />
+              </div>
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <label htmlFor="password">Password</label>
                   <Link
-                    href="/signup"
-                    className="underline underline-offset-4"
+                    href="/forgot-password"
+                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                   >
-                    Sign up
+                    Forgot your password?
                   </Link>
                 </div>
-              </form>
+                <input
+                  id="password"
+                  type="password"
+                  placeholder="Password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded focus:border-(--ring) focus:border-2"
+                />
+              </div>
+              {error && <p className="text-sm text-red-500">{error}</p>}
+              <button type="submit" className={`px-4 py-2 rounded-md bg-(--foreground) text-(--background) font-bold text-md hover:opacity-80 transition ${isLoading ? "cursor-not-allowed" : "cursor-pointer"}`} disabled={isLoading}>
+                {isLoading ? "Logging in..." : "Login"}
+              </button>
+            </div>
+            <div className="mt-4 text-center text-sm">
+              Don&apos;t have an account?{" "}
+              <Link
+                href="/signup"
+                className="underline underline-offset-4"
+              >
+                Sign up
+              </Link>
+            </div>
+          </form>
         </div>
       </div>
     </div>

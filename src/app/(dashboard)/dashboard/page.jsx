@@ -324,7 +324,7 @@ const Dashboard = () => {
                         {queue.live ?
                           <button
                             onClick={() => setJoinQueue(queue)}
-                            className="px-4 py-2 rounded-md transition-colors bg-(--primary) text-(--primary-foreground) cursor-pointer hover:opacity-90 outline-none"
+                            className="px-4 py-2 rounded-md transition-colors bg-(--primary) text-(--primary-foreground) cursor-pointer hover:opacity-90"
                           >
                             Join
                           </button> :
@@ -375,7 +375,7 @@ const Dashboard = () => {
                                     value={joinQueueKey}
                                     autoComplete='off'
                                     onChange={(e) => setJoinQueueKey(e.target.value)}
-                                    className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded outline-none focus:border-(--ring) focus:border-2 w-full"
+                                    className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded focus:border-(--ring) focus:border-2 w-full"
                                   />
                                 </div>
                                 <button type="submit" className={`px-4 py-2 rounded-md bg-(--foreground) text-(--background) font-bold text-md hover:opacity-80 transition w-full ${isJoining ? "cursor-not-allowed" : "cursor-pointer"}`} disabled={isJoining}>
@@ -445,7 +445,7 @@ const Dashboard = () => {
                                 }
                               )
                             }
-                            className="py-2 px-4 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 bg-(--destructive) text-(--destructive-foreground) cursor-pointer shadow-md hover:opacity-90"
+                            className="py-2 px-4 rounded-md font-medium transition-colors focus:ring-2 bg-(--destructive) text-(--destructive-foreground) cursor-pointer shadow-md hover:opacity-90"
                           >
                             Quit
                           </button>
@@ -499,7 +499,7 @@ const Dashboard = () => {
                     value={joinQueueKey}
                     onChange={(e) => setJoinQueueKey(e.target.value)}
                     placeholder="Enter queue key"
-                    className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)" />
+                    className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:ring-2 focus:ring-(--ring)" />
 
                   <button
                     type='submit'

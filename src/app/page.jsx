@@ -81,7 +81,7 @@ export default function Home() {
                 href="/signup"
                 className="inline-flex w-full items-center justify-center rounded-lg bg-(--primary) px-6 py-3 font-medium
                    text-(--primary-foreground) shadow-md transition
-                   hover:opacity-95 focus:outline-none focus:ring-4 focus:ring-(--ring)
+                   hover:opacity-95 focus:ring-4 focus:ring-(--ring)
                    active:translate-y-0.5 sm:w-auto"
               >
                 Get Started
@@ -91,7 +91,7 @@ export default function Home() {
                 href="/about"
                 className="inline-flex w-full items-center justify-center rounded-lg border border-(--border) px-6 py-3
                    text-(--foreground) transition
-                   hover:bg-(--muted)/50 focus:outline-none focus:ring-4 focus:ring-(--ring)
+                   hover:bg-(--muted)/50 focus:ring-4 focus:ring-(--ring)
                    sm:w-auto"
               >
                 About Us
@@ -139,7 +139,7 @@ export default function Home() {
               href="/signup"
               className="mt-8 inline-block rounded-lg bg-(--primary) px-8 py-3 font-medium
                  text-(--primary-foreground) shadow-md transition
-                 hover:opacity-95 focus:outline-none focus:ring-4 focus:ring-(--ring)"
+                 hover:opacity-95 focus:ring-4 focus:ring-(--ring)"
             >
               Try Lineless
             </Link>

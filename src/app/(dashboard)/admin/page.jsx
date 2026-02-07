@@ -316,7 +316,7 @@ const AdminDashboard = () => {
                         setNewQueue({ ...newQueue, name: e.target.value })
                       }
                       placeholder="e.g., Hospital Registration"
-                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)"
+                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:ring-2 focus:ring-(--ring)"
                       required />
                   </div>
 
@@ -330,7 +330,7 @@ const AdminDashboard = () => {
                       value={newQueue.venue}
                       onChange={(e) => setNewQueue({ ...newQueue, venue: e.target.value })}
                       placeholder="Enter venue address (defaults to your location)"
-                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:outline-none focus:ring-2 focus:ring-(--ring)" />
+                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:ring-2 focus:ring-(--ring)" />
                   </div>
 
                   <button
@@ -374,7 +374,7 @@ const AdminDashboard = () => {
                         </div>
 
                         <div className="flex items-center gap-4">
-                          <button className='text-(--muted-foreground) cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-lg outline-none' onClick={() => setOpenQueueId(queue.id)}>
+                          <button className='text-(--muted-foreground) cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-lg' onClick={() => setOpenQueueId(queue.id)}>
                             <QrCode />
                           </button>
                           <Modal
@@ -420,7 +420,7 @@ const AdminDashboard = () => {
                           </button>
                           <button
                             onClick={() => setDeleteQueueId(queue.id)}
-                            className='text-(--destructive) cursor-pointer hover:text-(--destructive)/70 outline-none'
+                            className='text-(--destructive) cursor-pointer hover:text-(--destructive)/70'
                           >
                             <Trash2 />
                           </button>

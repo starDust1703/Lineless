@@ -1,3 +1,8 @@
+export const metadata = {
+  title: "Lineless - Legal",
+  description: "Terms of Service and Privacy Policy for Lineless, the online queue management app that replaces physical lines with digital tokens. Read about our terms of use, data collection practices, and how we protect your privacy while using Lineless.",
+};
+
 export default function LegalPage() {
   return (
     <main className="min-h-screen text-(--foreground) px-6 py-16">

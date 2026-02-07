@@ -81,7 +81,7 @@ export default function UserHeader({ user }) {
 
           <Dropdown
             trigger={<button
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-(--border) bg-(--muted) text-sm font-semibold hover:bg-(--primary)/10 outline-none cursor-pointer"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-(--border) bg-(--muted) text-sm font-semibold hover:bg-(--primary)/10 cursor-pointer"
             >
               {name && name[0]?.toUpperCase()}
             </button>}

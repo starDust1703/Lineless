@@ -23,7 +23,7 @@ const ThemeSwitcher = () => {
     <button
       type="button"
       aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"}
-      className="cursor-pointer hover:text-(--foreground) outline-none flex"
+      className="cursor-pointer hover:text-(--foreground) flex"
       onClick={() => setTheme(isLight ? "dark" : "light")}
     >
       {isLight ?

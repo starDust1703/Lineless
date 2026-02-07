@@ -1,3 +1,8 @@
+export const metadata = {
+  title: "Lineless - About",
+  description: "Learn about Lineless, the online queue management app that replaces physical lines with digital tokens. Discover how Lineless works, its benefits for users and businesses, and the technology behind it.",
+};
+
 export default function About() {
   return (
     <main className="min-h-screen px-6 py-24 text-(--foreground)">

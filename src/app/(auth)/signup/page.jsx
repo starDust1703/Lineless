@@ -71,7 +71,7 @@ export default function SignUp() {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded outline-none focus:border-(--ring) focus:border-2"
+                  className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded focus:border-(--ring) focus:border-2"
                 />
               </div>
               <div className="grid gap-2">
@@ -85,7 +85,7 @@ export default function SignUp() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded outline-none focus:border-(--ring) focus:border-2"
+                  className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded focus:border-(--ring) focus:border-2"
                 />
               </div>
               <div className="grid gap-2">
@@ -98,7 +98,7 @@ export default function SignUp() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded outline-none focus:border-(--ring) focus:border-2"
+                  className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded focus:border-(--ring) focus:border-2"
                 />
               </div>
               <div className="grid gap-2">
@@ -111,7 +111,7 @@ export default function SignUp() {
                   required
                   value={repeatPassword}
                   onChange={(e) => setRepeatPassword(e.target.value)}
-                  className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded outline-none focus:border-(--ring) focus:border-2"
+                  className="p-1 -my-1 border-2 border-(--muted-foreground)/40 px-3 rounded focus:border-(--ring) focus:border-2"
                 />
               </div>
 

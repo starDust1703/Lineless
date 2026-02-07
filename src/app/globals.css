@@ -43,7 +43,7 @@
 
   --border: hsl(220 18% 18%);
   --input: hsl(220 18% 20%);
-  --ring: hsl(300 80% 55%);
+  --ring: hsl(168, 80%, 55%);
 
   --destructive: hsl(348 90% 55%);
   --destructive-foreground: hsl(0 0% 100%);
@@ -59,6 +59,7 @@
 @layer base {
   * {
     scrollbar-width: thin;
+    outline: none;
     scrollbar-color: var(--primary) var(--muted);
   }
 

@@ -2,6 +2,11 @@ import UserHeader from "../../../components/UserHeader";
 import { createClient } from "../../../lib/supabase/server";
 import { redirect } from "next/navigation";
 
+export const metadata = {
+  title: "Lineless - Admin Dashboard",
+  description: "Admin dashboard for Lineless, where you can manage users, view analytics, and configure settings for the Lineless platform.",
+};
+
 export default async function AdminLayout({ children }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
