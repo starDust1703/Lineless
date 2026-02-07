@@ -1,10 +1,11 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Users, Plus, Clock, UserRoundPen, QrCode, X, Download, Share2, Trash2, TriangleAlert } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '../../../lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Modal from '../../../components/ui/Modal';
+import MapPicker from '../../../components/ui/Map';
 
 const AdminDashboard = () => {
   const supabase = createClient();
@@ -14,11 +15,14 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("create");
   const [newQueue, setNewQueue] = useState({ name: "", venue: "" });
+  const [venueLoc, setVenueLoc] = useState(null);
   const [openQueueId, setOpenQueueId] = useState(null);
   const [deleteQueueId, setDeleteQueueId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const debounceRef = useRef(null);
 
   useEffect(() => {
+    getCurrLocation();
     fetchUserQueues();
   }, []);
 
@@ -96,9 +100,9 @@ const AdminDashboard = () => {
           (position) => {
             const loc = {
               lat: position.coords.latitude,
-              lon: position.coords.longitude,
+              lng: position.coords.longitude,
             };
-
+            setVenueLoc(loc);
             resolve(loc);
           },
           (error) => {
@@ -133,13 +137,13 @@ const AdminDashboard = () => {
     }
 
     try {
-      const { lat, lon } = (newQueue.venue ? await getCoordinates(newQueue.venue) : await getCurrLocation());
+      const { lat, lng } = venueLoc || (newQueue.venue ? await getCoordinates(newQueue.venue) : await getCurrLocation());
 
       const { data, error } = await supabase.rpc('create_queue', {
         p_name: newQueue.name,
         p_q_key: generateQKey(),
         p_latitude: Number(lat),
-        p_longitude: Number(lon),
+        p_longitude: Number(lng),
         p_loc_name: newQueue.venue || null
       });
 
@@ -290,18 +294,15 @@ const AdminDashboard = () => {
                 Admin access required
               </p>
 
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                toast.promise(
-                  handleCreateQueue(),
-                  {
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  toast.promise(handleCreateQueue(), {
                     loading: "Creating...",
                     success: () => `Created ${newQueue.name}`,
                     error: "Error",
-                  }
-                )
-              }
-              } className="flex flex-col items-center">
+                  });
+                }} className="flex flex-col items-center">
                 <div className='max-w-md w-full space-y-4'>
                   <div>
                     <label htmlFor='qName' className="block text-sm font-medium mb-2 text-(--foreground)">
@@ -326,11 +327,39 @@ const AdminDashboard = () => {
                     </label>
 
                     <input
-                      id='venue'
+                      id="venue"
                       value={newQueue.venue}
-                      onChange={(e) => setNewQueue({ ...newQueue, venue: e.target.value })}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setNewQueue({ ...newQueue, venue: value });
+
+                        if (debounceRef.current) clearTimeout(debounceRef.current);
+
+                        debounceRef.current = setTimeout(async () => {
+                          const query = value.trim();
+                          if (!query) return;
+
+                          try {
+                            const { lat, lon } = await getCoordinates(query);
+                            if (lat != null && lon != null) {
+                              setVenueLoc({ lat, lng: lon });
+                            }
+                          } catch { }
+                        }, 500);
+                      }}
                       placeholder="Enter venue address (defaults to your location)"
-                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:ring-2 focus:ring-(--ring)" />
+                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:ring-2 focus:ring-(--ring)"
+                    />
+
+                  </div>
+
+                  <div className="w-full h-full rounded-md border border-(--input)">
+                    <MapPicker
+                      defCoords={venueLoc}
+                      onLocationSelect={({ lat, lng }) => {
+                        setVenueLoc({ lat, lng });
+                      }}
+                    />
                   </div>
 
                   <button
