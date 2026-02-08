@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { MapPin, Users, LogIn, Clock, Navigation, MapPinned, X, BellPlus, LogOut, MoreVertical } from 'lucide-react';
+import { MapPin, Users, LogIn, Clock, Navigation, MapPinned, X, BellPlus, LogOut, MoreVertical, User, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '../../../lib/supabase/client';
 import { useSearchParams } from 'next/navigation';
@@ -24,6 +24,7 @@ const Dashboard = () => {
   const [notifyFor, setNotifyFor] = useState(null);
   const [notifyRank, setNotifyRank] = useState(1);
   const [isSettingNotify, setIsSettingNotify] = useState(false);
+  const [showDetailsFor, setShowDetails] = useState(null);
   const supabase = createClient();
 
   useEffect(() => {
@@ -148,7 +149,7 @@ const Dashboard = () => {
 
       const { data, error } = await supabase
         .from('queue_members')
-        .select('*, queues(name, population, live, latitude, longitude)')
+        .select('*, queues(name, population, live, description, latitude, longitude, loc_name), profiles(name)')
         .eq('user_id', User.id)
         .order('position', { ascending: true });
 
@@ -451,10 +452,61 @@ const Dashboard = () => {
                         <div className="flex-1 min-w-0">
                           <div className='flex gap-2 items-center'>
                             {qm.queues.live ? <LiveDot /> : <PausedDot />}
-                            <h3 className="text-lg font-semibold text-(--ring)">
+                            <h3 className="text-lg font-semibold text-(--ring) cursor-pointer hover:opacity-80 transition" onClick={() => setShowDetails(qm.id)}>
                               {qm.queues.name}
                             </h3>
                           </div>
+
+                          <Modal
+                            open={showDetailsFor === qm.id}
+                            setOpen={() => setShowDetails(null)}
+                            comp={
+                              <div>
+                                <div className="mb-4">
+                                  <h2 className="text-xl font-semibold tracking-tight">
+                                    {qm.queues.name}
+                                  </h2>
+                                  <div className=''>
+                                    {qm.queues.loc_name && (
+                                      <div className="flex items-center gap-2 text-sm text-(--muted-foreground) mt-1">
+                                        <MapPin size={16} />
+                                        <span>{qm.queues.loc_name}</span>
+                                      </div>
+                                    )}
+                                    {(qm.queues.latitude && qm.queues.longitude) && (
+                                      <div className="mt-2 text-[11px] text-(--muted-foreground) font-mono">
+                                        {qm.queues.latitude.toFixed(4)}, {qm.queues.longitude.toFixed(4)}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {qm.queues.description && (
+                                  <div className="mb-4 bg-(--background)/80 rounded-xl p-3 border border-(--border)">
+                                    <div className="flex items-center gap-2 text-sm font-medium mb-1 text-(--foreground)/90">
+                                      <Info size={15} />
+                                      Description
+                                    </div>
+                                    <p className="text-sm text-(--foreground)/70 leading-relaxed">
+                                      {qm.queues.description}
+                                    </p>
+                                  </div>
+                                )}
+
+                                {qm.profiles.name && (
+                                  <div className="flex items-center gap-2 text-sm text-(--foreground)/90 mb-3">
+                                    <User size={16} />
+                                    <span>Hosted by <span className="font-medium">{qm.profiles.name}</span></span>
+                                  </div>
+                                )}
+
+                                <div className="flex items-center gap-2 text-sm text-(--foreground)/90">
+                                  <Users size={16} />
+                                  <span>{qm.queues.population} in queue</span>
+                                </div>
+                              </div>
+                            }
+                          />
 
                           <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-(--muted-foreground)">
                             <span className="flex items-center gap-1">
