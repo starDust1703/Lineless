@@ -11,6 +11,7 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  preload: false,
 });
 
 export const metadata = {
@@ -22,7 +23,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-(--background)`}
+        className={`${geistSans.className} ${geistSans.variable} ${geistMono.variable} antialiased bg-(--background)`}
       >
         <Toaster position="top-center" />
         <ThemeProvider

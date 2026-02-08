@@ -253,14 +253,14 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-[90vh]">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="mb-8">
           <h1 className="text-3xl text-(--foreground) font-bold mb-2 sm:text-4xl">LineLess Admin</h1>
           <p className="text-(--muted-foreground) text-sm sm:text-[16px]">Manage your queues digitally</p>
         </div>
 
         <div className='w-full flex justify-center'>
-          <div className="flex gap-2 w-2xl mb-6 rounded-lg p-1 shadow bg-(--card) text-xs sm:text-[16px]">
+          <div className="flex gap-2 w-full max-w-2xl mb-6 rounded-lg p-1 shadow bg-(--card) text-xs sm:text-[16px]">
             <button
               onClick={() => setActiveTab('create')}
               className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer flex items-center justify-center ${activeTab === 'create' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
@@ -279,7 +279,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className="rounded-lg shadow-lg p-6 bg-(--card)">
+        <div className="rounded-lg shadow-lg p-4 sm:p-6 bg-(--card)">
           {activeTab === 'create' && (
             <div>
               <h2 className="sm:text-2xl text-xl font-bold mb-2 text-(--foreground)">
@@ -302,7 +302,7 @@ const AdminDashboard = () => {
                 )
               }
               } className="flex flex-col items-center">
-                <div className='max-w-md w-full space-y-4'>
+                <div className='max-w-md w-full space-y-4 sm:space-y-5'>
                   <div>
                     <label htmlFor='qName' className="block text-sm font-medium mb-2 text-(--foreground)">
                       Queue Name
@@ -354,8 +354,8 @@ const AdminDashboard = () => {
                   userQueues.map((queue) => (
                     <div
                       key={queue.id}
-                      className="border border-(--border) rounded-lg p-4 transition-shadow hover:shadow-md">
-                      <div className="flex justify-between items-start gap-4">
+                      className="border border-(--border) rounded-lg p-4 sm:p-5 transition-shadow hover:shadow-md">
+                      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                         <div className="flex-1 min-w-0">
                           <h3 className="text-lg font-semibold text-(--ring)">
                             {queue.name}
@@ -364,7 +364,7 @@ const AdminDashboard = () => {
                           <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-(--muted-foreground)">
                             <span className="flex items-center gap-1">
                               <Users className="w-4 h-4" />
-                              {queue.population} total
+                              {queue.population} member{queue.population != 1 && 's'}
                             </span>
                             <span className="flex items-center gap-1">
                               <Clock className="w-4 h-4" />
@@ -373,7 +373,7 @@ const AdminDashboard = () => {
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-4">
+                        <div className="flex flex-wrap items-center gap-3 sm:gap-4 w-full md:w-auto">
                           <button className='text-(--muted-foreground) cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-lg' onClick={() => setOpenQueueId(queue.id)}>
                             <QrCode />
                           </button>
@@ -403,6 +403,7 @@ const AdminDashboard = () => {
 
                                 <div className='flex justify-center p-4'>
                                   <img
+                                    className="w-64 h-64 sm:w-72 sm:h-72 max-w-full"
                                     src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(queue.q_key)}`}
                                     alt='qr-code'
                                   />
@@ -471,14 +472,6 @@ const AdminDashboard = () => {
                               </div>
                             }
                           />
-                          <div className="text-right">
-                            <div className="text-2xl font-bold text-(--foreground)">
-                              {queue.population}
-                            </div>
-                            <div className="text-xs text-(--muted-foreground)">
-                              Members
-                            </div>
-                          </div>
                         </div>
                       </div>
                     </div>

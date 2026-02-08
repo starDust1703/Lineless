@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { MapPin, Users, LogIn, Clock, Navigation, MapPinned, X, BellPlus } from 'lucide-react';
+import { MapPin, Users, LogIn, Clock, Navigation, MapPinned, X, BellPlus, LogOut, MoreVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '../../../lib/supabase/client';
 import { useSearchParams } from 'next/navigation';
@@ -8,6 +8,7 @@ import UserHeader from '../../../components/UserHeader';
 import Link from 'next/link';
 import Modal from '../../../components/ui/Modal';
 import { requestNotificationPermission, sendNotification } from '../../../lib/notifications/notification';
+import Dropdown from '../../../components/ui/DropDown';
 
 const Dashboard = () => {
   const searchParams = useSearchParams();
@@ -301,7 +302,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-[90vh]">
       <UserHeader user={user} />
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="mb-8">
           <h1 className="text-3xl text-(--foreground) font-bold mb-2 sm:text-4xl">LineLess Dashboard</h1>
           <p className="text-(--muted-foreground) text-sm sm:text-[16px]">Join in queues digitally</p>
@@ -310,28 +311,28 @@ const Dashboard = () => {
         <div className="flex gap-2 mb-6 rounded-lg p-1 shadow bg-(--card) text-xs sm:text-[16px] overflow-x-auto">
           <button
             onClick={() => setActiveTab('nearby')}
-            className={`flex-1 w-80 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer flex items-center justify-center ${activeTab === 'nearby' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
+            className={`flex-1 min-w-40 sm:min-w-48 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer flex items-center justify-center ${activeTab === 'nearby' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
           >
             <Navigation className="inline w-4 h-4 mr-2" />
-            <div className='min-w-30'>Nearby Queues</div>
+            <div className="whitespace-nowrap">Nearby Queues</div>
           </button>
           <button
             onClick={() => setActiveTab('my-queues')}
-            className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer flex items-center justify-center ${activeTab === 'my-queues' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
+            className={`flex-1 min-w-40 sm:min-w-48 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer flex items-center justify-center ${activeTab === 'my-queues' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
           >
             <Clock className="inline w-4 h-4 mr-2" />
-            <div className='min-w-30'>My Queues</div>
+            <div className="whitespace-nowrap">My Queues</div>
           </button>
           <button
             onClick={() => setActiveTab('join')}
-            className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer flex items-center justify-center ${activeTab === 'join' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
+            className={`flex-1 min-w-40 sm:min-w-48 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer flex items-center justify-center ${activeTab === 'join' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
           >
             <LogIn className="inline w-4 h-4 mr-2" />
-            <div className='min-w-30'>Join Queue</div>
+            <div className="whitespace-nowrap">Join Queue</div>
           </button>
         </div>
 
-        <div className="rounded-lg shadow-lg p-6 bg-(--card)">
+        <div className="rounded-lg shadow-lg p-4 sm:p-6 bg-(--card)">
           {activeTab === 'nearby' && (
             <div>
               <h2 className="sm:text-2xl text-xl mb-2 font-bold text-(--foreground)">Queues Near You</h2>
@@ -343,15 +344,15 @@ const Dashboard = () => {
                   nearbyQueues.map((queue) => (
                     <div
                       key={queue.id}
-                      className="border rounded-lg p-4 transition-shadow hover:shadow-md border-(--border)"
+                      className="border rounded-lg p-4 sm:p-5 transition-shadow hover:shadow-md border-(--border)"
                     >
-                      <div className="flex justify-between items-center">
-                        <div className="flex-1">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                        <div className="flex-1 min-w-0">
                           <div className='flex gap-2 items-center'>
                             {queue.live ? <LiveDot /> : <PausedDot />}
                             <h3 className="text-lg font-semibold text-(--ring)">{queue.name}</h3>
                           </div>
-                          <div className="flex items-center gap-4 mt-2 text-sm text-(--muted-foreground)">
+                          <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-2 text-sm text-(--muted-foreground)">
                             <span className="flex items-center gap-1">
                               <Users className="w-4 h-4" />
                               {queue.population} in queue
@@ -365,11 +366,11 @@ const Dashboard = () => {
                         {queue.live ?
                           <button
                             onClick={() => setJoinQueue(queue)}
-                            className="px-4 py-2 rounded-md transition-colors bg-(--primary) text-(--primary-foreground) cursor-pointer hover:opacity-90"
+                            className="w-full sm:w-auto px-4 py-2 rounded-md transition-colors bg-(--primary) text-(--primary-foreground) cursor-pointer hover:opacity-90"
                           >
                             Join
                           </button> :
-                          <span className="px-4 py-2 rounded-md transition-colors bg-(--muted-foreground) text-(--primary-foreground) cursor-default">Paused</span>}
+                          <span className="w-full sm:w-auto text-center px-4 py-2 rounded-md transition-colors bg-(--muted-foreground) text-(--primary-foreground) cursor-default">Paused</span>}
                       </div>
                       <Modal
                         open={joinQueue === queue}
@@ -405,7 +406,7 @@ const Dashboard = () => {
                               )
                               setJoinQueueKey("");
                             }} className='flex flex-col items-center justify-center'>
-                              <div className='w-80 flex flex-col gap-6'>
+                              <div className='w-full max-w-sm flex flex-col gap-6'>
                                 <div className="grid gap-2">
                                   <label htmlFor="name">Queue key</label>
                                   <input
@@ -445,8 +446,8 @@ const Dashboard = () => {
                   userQueues.map((qm) => (
                     <div
                       key={qm.id}
-                      className="border border-(--border) rounded-lg p-4 transition-shadow hover:shadow-md">
-                      <div className="flex justify-between items-start gap-4">
+                      className="border border-(--border) rounded-lg p-4 sm:p-5 transition-shadow hover:shadow-md">
+                      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                         <div className="flex-1 min-w-0">
                           <div className='flex gap-2 items-center'>
                             {qm.queues.live ? <LiveDot /> : <PausedDot />}
@@ -467,17 +468,101 @@ const Dashboard = () => {
                           </div>
                         </div>
 
-                        <div className="flex items-end gap-4 sm:flex-row sm:items-center flex-col-reverse">
-                          {qm.position > 1 &&
+                        <div className="flex flex-wrap items-center gap-3 sm:gap-4 w-full lg:w-auto justify-start">
+                          <div className="hidden sm:flex flex-wrap items-center gap-3 sm:gap-4">
+                            {qm.position > 1 &&
+                              <button
+                                className='cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-full transition'
+                                onClick={() => {
+                                  setNotifyFor(qm.id);
+                                  setNotifyRank(qm.notify_rank || 1)
+                                }}>
+                                <BellPlus />
+                              </button>
+                            }
+                            <Link
+                              href={`https://www.google.com/maps/dir/?api=1&destination=${qm.queues.latitude},${qm.queues.longitude}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className='text-(--ring) cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-full transition'>
+                              <MapPinned />
+                            </Link>
                             <button
-                              className='cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-full transition'
-                              onClick={() => {
-                                setNotifyFor(qm.id);
-                                setNotifyRank(qm.notify_rank || 1)
-                              }}>
-                              <BellPlus />
+                              onClick={() =>
+                                toast.promise(
+                                  handleLeaveQueue(qm.id),
+                                  {
+                                    loading: "Quitting...",
+                                    success: () => `Exited ${qm.queues.name}`,
+                                    error: "Error",
+                                  }
+                                )
+                              }
+                              className="py-2 px-4 rounded-md font-medium transition-colors focus:ring-2 bg-(--destructive) text-(--destructive-foreground) cursor-pointer shadow-md hover:opacity-90"
+                            >
+                              Quit
                             </button>
-                          }
+                          </div>
+
+                          <div className="sm:hidden flex justify-between w-full px-2">
+                            <div className='flex flex-col'>
+                              <div className="text-2xl font-bold text-(--foreground)">
+                                #{qm.position}
+                              </div>
+                              <div className="text-xs text-(--muted-foreground)">
+                                Your Position
+                              </div>
+                            </div>
+                            <div className="text-left sm:text-right sm:ml-auto">
+                              <Dropdown
+                                trigger={<button className="list-none p-2 rounded-full border border-(--border) bg-(--muted)/40 text-sm font-medium cursor-pointer select-none">
+                                  <MoreVertical />
+                                </button>}
+                                items={[
+                                  qm.position > 1 && {
+                                    label: <div className="flex items-center gap-2">
+                                      <BellPlus className="size-4" />
+                                      Notify
+                                    </div>,
+                                    onClick: () => {
+                                      setNotifyFor(qm.id);
+                                      setNotifyRank(qm.notify_rank || 1)
+                                    }
+                                  }, {
+                                    label: <Link
+                                      href={`https://www.google.com/maps/dir/?api=1&destination=${qm.queues.latitude},${qm.queues.longitude}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="flex items-center gap-2"
+                                    >
+                                      <MapPinned className="size-4" />
+                                      Directions
+                                    </Link>
+                                  },
+                                  {
+                                    label:
+                                      <div
+                                        onClick={() =>
+                                          toast.promise(
+                                            handleLeaveQueue(qm.id),
+                                            {
+                                              loading: "Quitting...",
+                                              success: () => `Exited ${qm.queues.name}`,
+                                              error: "Error",
+                                            }
+                                          )
+                                        }
+                                        className="flex items-center gap-2 text-(--destructive)"
+                                      >
+                                        <LogOut className='size-4'/>
+                                        Quit
+                                      </div>
+                                  }
+                                ]}
+                                styles={'bottom-10'} />
+                            </div>
+                          </div>
+
                           <Modal
                             open={notifyFor === qm.id}
                             setOpen={() => setNotifyFor(null)}
@@ -550,30 +635,8 @@ const Dashboard = () => {
                               </div>
                             }
                           />
-                          <Link
-                            href={`https://www.google.com/maps/dir/?api=1&destination=${qm.queues.latitude},${qm.queues.longitude}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className='text-(--ring) cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-full transition'>
-                            <MapPinned />
-                          </Link>
-                          <button
-                            onClick={() =>
-                              toast.promise(
-                                handleLeaveQueue(qm.id),
-                                {
-                                  loading: "Quitting...",
-                                  success: () => `Exited ${qm.queues.name}`,
-                                  error: "Error",
-                                }
-                              )
-                            }
-                            className="py-2 px-4 rounded-md font-medium transition-colors focus:ring-2 bg-(--destructive) text-(--destructive-foreground) cursor-pointer shadow-md hover:opacity-90"
-                          >
-                            Quit
-                          </button>
 
-                          <div className="text-right">
+                          <div className="text-left sm:text-right sm:ml-auto not-sm:hidden">
                             <div className="text-2xl font-bold text-(--foreground)">
                               #{qm.position}
                             </div>

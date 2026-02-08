@@ -85,15 +85,14 @@ export default function UserHeader({ user }) {
             >
               {name && name[0]?.toUpperCase()}
             </button>}
-            items={isAdmin ? [
+            items={[
               { label: name },
-              {
-                label: (pathname == '/dashboard') ? "Admin" : "Dashboard", onClick: () => router.push(`${pathname == '/dashboard' ? '/admin' : '/dashboard'}`)
+              isAdmin && {
+                label: (pathname == '/dashboard') ? "Admin" : "Dashboard",
+                onClick: () => router.push(`${pathname == '/dashboard' ? '/admin' : '/dashboard'}`)
               },
               { label: "Log out", onClick: handleLogout },
-            ] :
-              [{ label: name },
-              { label: "Log out", onClick: handleLogout },]}
+            ]}
           />
         </nav>
       </div>

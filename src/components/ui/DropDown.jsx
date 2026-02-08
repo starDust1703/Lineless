@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 
-export default function Dropdown({ trigger, items }) {
+export default function Dropdown({ trigger, items, styles }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -22,7 +22,7 @@ export default function Dropdown({ trigger, items }) {
       </div>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-44 rounded-xl bg-(--background)/95 backdrop-blur-2xl shadow-lg border text-sm flex flex-col gap-1 p-1 border-(--border)">
+        <div className={`absolute ${styles} right-0 mt-2 w-44 rounded-xl bg-(--background) backdrop-blur-xl shadow-lg border text-sm flex flex-col gap-1 p-1 border-(--border)`}>
           {items.map((item, i) => (
             <button
               key={i}
