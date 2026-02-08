@@ -1,12 +1,13 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { MapPin, Users, LogIn, Clock, Navigation, MapPinned, X } from 'lucide-react';
+import { MapPin, Users, LogIn, Clock, Navigation, MapPinned, X, BellPlus } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '../../../lib/supabase/client';
 import { useSearchParams } from 'next/navigation';
 import UserHeader from '../../../components/UserHeader';
 import Link from 'next/link';
 import Modal from '../../../components/ui/Modal';
+import { requestNotificationPermission, sendNotification } from '../../../lib/notifications/notification';
 
 const Dashboard = () => {
   const searchParams = useSearchParams();
@@ -19,6 +20,9 @@ const Dashboard = () => {
   const [joinQueue, setJoinQueue] = useState(null);
   const [isJoining, setIsJoining] = useState(false);
   const [joinQueueKey, setJoinQueueKey] = useState(searchParams.get("q") ?? "");
+  const [notifyFor, setNotifyFor] = useState(null);
+  const [notifyRank, setNotifyRank] = useState(1);
+  const [isSettingNotify, setIsSettingNotify] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -39,6 +43,9 @@ const Dashboard = () => {
         },
         (payload) => {
           fetchUserQueues(user);
+          if (payload.new.position <= payload.new.notify_rank && !payload.new.is_notified) {
+            handleNotification(payload.new);
+          }
           fetchNearbyQueues();
         }
       ).on(
@@ -78,6 +85,8 @@ const Dashboard = () => {
   };
 
   const initializeDashboard = async () => {
+    await requestNotificationPermission();
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
 
@@ -190,6 +199,38 @@ const Dashboard = () => {
       setIsJoining(false);
     }
   };
+
+  const handleSetNotify = async (qm_id) => {
+    if (isSettingNotify) return;
+    setIsSettingNotify(true);
+
+    try {
+      const { error } = await supabase
+        .from('queue_members')
+        .update({ notify_rank: notifyRank, is_notified: false })
+        .eq('id', qm_id);
+      if (error) throw error;
+
+      setNotifyRank(1);
+      setNotifyFor(null);
+    } finally {
+      setIsSettingNotify(false);
+    }
+  };
+
+  const handleNotification = async (qm) => {
+    const queueName =
+      userQueues.find(q => q.id === qm.id)?.queues?.name || "Queue";
+
+    await sendNotification(
+      "Your turn is approaching",
+      `You are now at position ${qm.position} in ${queueName}`
+    );
+    await supabase
+      .from('queue_members')
+      .update({ notify_rank: null, is_notified: true })
+      .eq('id', qm.id);
+  }
 
   const handleLeaveQueue = async (qmId) => {
     const { error } = await supabase.rpc('leave_queue', {
@@ -427,11 +468,93 @@ const Dashboard = () => {
                         </div>
 
                         <div className="flex items-end gap-4 sm:flex-row sm:items-center flex-col-reverse">
+                          {qm.position > 1 &&
+                            <button
+                              className='cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-full transition'
+                              onClick={() => {
+                                setNotifyFor(qm.id);
+                                setNotifyRank(qm.notify_rank || 1)
+                              }}>
+                              <BellPlus />
+                            </button>
+                          }
+                          <Modal
+                            open={notifyFor === qm.id}
+                            setOpen={() => setNotifyFor(null)}
+                            comp={
+                              <div className="p-5">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setJoinQueue(null);
+                                    setJoinQueueKey("");
+                                  }}
+                                  className="absolute top-3 right-3 p-1 rounded-md hover:bg-(--muted) transition"
+                                >
+                                  <X className="w-4 h-4 text-(--muted-foreground)" />
+                                </button>
+
+                                <h3 className="text-base font-semibold mb-4">
+                                  Notify Before Turn
+                                </h3>
+
+                                <form
+                                  className="flex flex-col gap-4"
+                                  onSubmit={(e) => {
+                                    e.preventDefault();
+                                    toast.promise(
+                                      handleSetNotify(qm.id),
+                                      {
+                                        loading: "Setting...",
+                                        success: () =>
+                                          `Notification at rank ${notifyRank} for ${qm.queues.name}`,
+                                        error: "Error",
+                                      }
+                                    );
+                                  }}
+                                >
+
+                                  <label className="text-sm text-(--muted-foreground)">
+                                    Alert before rank:
+                                    <span className="ml-2 font-semibold text-(--foreground)">
+                                      {notifyRank}
+                                    </span>
+                                  </label>
+
+                                  <div className="flex flex-col items-center gap-2">
+                                    <input
+                                      type="range"
+                                      min={1}
+                                      max={qm.position - 1}
+                                      step={1}
+                                      value={notifyRank}
+                                      onChange={(e) => setNotifyRank(Number(e.target.value))}
+                                      className="slider w-full"
+                                    />
+
+                                    <div className="flex justify-between w-full text-xs text-(--muted-foreground)">
+                                      <span>1</span>
+                                      <span>{qm.position - 1}</span>
+                                    </div>
+                                  </div>
+
+                                  <button
+                                    type="submit"
+                                    disabled={isSettingNotify}
+                                    className={`w-full py-2 rounded-lg text-sm font-medium transition ${isSettingNotify ? "bg-(--muted) text-(--muted-foreground) cursor-not-allowed" : "bg-indigo-500 hover:bg-indigo-600 text-white shadow"}`}
+                                  >
+                                    {isSettingNotify ? "Setting..." : "Set Alert"}
+                                  </button>
+
+                                </form>
+                              </div>
+                            }
+                          />
                           <Link
                             href={`https://www.google.com/maps/dir/?api=1&destination=${qm.queues.latitude},${qm.queues.longitude}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className='text-(--ring) cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-full'>
+                            className='text-(--ring) cursor-pointer border border-(--border) hover:bg-(--muted-foreground)/10 p-2 rounded-full transition'>
                             <MapPinned />
                           </Link>
                           <button
