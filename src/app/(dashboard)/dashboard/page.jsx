@@ -191,10 +191,13 @@ const Dashboard = () => {
         queueName = data.name;
       }
 
-      const { error } = await supabase.rpc('join_queue', { q_id: qId });
+      const { data, error } = await supabase.rpc('join_queue', { q_id: qId });
       if (error) throw error;
 
       setJoinQueueKey('');
+      setUserQueues(prev =>
+        [data, ...prev].sort((a, b) => a.position - b.position)
+      );
       return queueName ?? "queue";
     } finally {
       setIsJoining(false);
@@ -313,21 +316,21 @@ const Dashboard = () => {
             onClick={() => setActiveTab('nearby')}
             className={`flex-1 min-w-40 sm:min-w-48 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer flex items-center justify-center ${activeTab === 'nearby' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
           >
-            <Navigation className="inline w-4 h-4 mr-2" />
+            <Navigation className="inline size-4 mr-2" />
             <div className="whitespace-nowrap">Nearby Queues</div>
           </button>
           <button
             onClick={() => setActiveTab('my-queues')}
             className={`flex-1 min-w-40 sm:min-w-48 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer flex items-center justify-center ${activeTab === 'my-queues' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
           >
-            <Clock className="inline w-4 h-4 mr-2" />
+            <Clock className="inline size-4 mr-2" />
             <div className="whitespace-nowrap">My Queues</div>
           </button>
           <button
             onClick={() => setActiveTab('join')}
             className={`flex-1 min-w-40 sm:min-w-48 py-3 px-4 rounded-md font-medium transition-colors cursor-pointer flex items-center justify-center ${activeTab === 'join' ? "text-(--primary-foreground) bg-(--primary)" : "text-(--muted-foreground)"}`}
           >
-            <LogIn className="inline w-4 h-4 mr-2" />
+            <LogIn className="inline size-4 mr-2" />
             <div className="whitespace-nowrap">Join Queue</div>
           </button>
         </div>
@@ -354,11 +357,11 @@ const Dashboard = () => {
                           </div>
                           <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-2 text-sm text-(--muted-foreground)">
                             <span className="flex items-center gap-1">
-                              <Users className="w-4 h-4" />
+                              <Users className="size-4" />
                               {queue.population} in queue
                             </span>
                             <span className="flex items-center gap-1">
-                              <MapPin className="w-4 h-4" />
+                              <MapPin className="size-4" />
                               {queue.distance?.toFixed(2)} km away
                             </span>
                           </div>
@@ -458,11 +461,11 @@ const Dashboard = () => {
 
                           <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-(--muted-foreground)">
                             <span className="flex items-center gap-1">
-                              <MapPin className="w-4 h-4" />
+                              <MapPin className="size-4" />
                               {qm.distance?.toFixed(2)} km away
                             </span>
                             <span className="flex items-center gap-1">
-                              <Clock className="w-4 h-4 self-start sm:self-center" />
+                              <Clock className="size-4 self-start sm:self-center" />
                               Joined {formatDateTime(new Date(qm.joined_at))}
                             </span>
                           </div>
@@ -554,7 +557,7 @@ const Dashboard = () => {
                                         }
                                         className="flex items-center gap-2 text-(--destructive)"
                                       >
-                                        <LogOut className='size-4'/>
+                                        <LogOut className='size-4' />
                                         Quit
                                       </div>
                                   }
@@ -576,7 +579,7 @@ const Dashboard = () => {
                                   }}
                                   className="absolute top-3 right-3 p-1 rounded-md hover:bg-(--muted) transition"
                                 >
-                                  <X className="w-4 h-4 text-(--muted-foreground)" />
+                                  <X className="size-4 text-(--muted-foreground)" />
                                 </button>
 
                                 <h3 className="text-base font-semibold mb-4">
