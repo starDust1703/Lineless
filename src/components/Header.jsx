@@ -22,8 +22,9 @@ export default function Header() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Link
           href="/"
-          className="text-xl font-semibold tracking-tight text-(--foreground)"
+          className="text-xl font-semibold tracking-tight text-(--foreground) flex items-center gap-2"
         >
+          <img src={'/icon.svg'} className="size-8" />
           LineLess
         </Link>
 

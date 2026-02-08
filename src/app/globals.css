@@ -55,7 +55,6 @@
   --radius: 0.5rem;
 }
 
-
 @layer base {
   * {
     scrollbar-width: thin;

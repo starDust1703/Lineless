@@ -191,13 +191,10 @@ const Dashboard = () => {
         queueName = data.name;
       }
 
-      const { data, error } = await supabase.rpc('join_queue', { q_id: qId });
+      const { error } = await supabase.rpc('join_queue', { q_id: qId });
       if (error) throw error;
 
       setJoinQueueKey('');
-      setUserQueues(prev =>
-        [data, ...prev].sort((a, b) => a.position - b.position)
-      );
       return queueName ?? "queue";
     } finally {
       setIsJoining(false);

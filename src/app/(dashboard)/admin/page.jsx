@@ -13,7 +13,7 @@ const AdminDashboard = () => {
   const [userQueues, setUserQueues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("create");
-  const [newQueue, setNewQueue] = useState({ name: "", venue: "" });
+  const [newQueue, setNewQueue] = useState({ name: "", venue: "", desc: "" });
   const [openQueueId, setOpenQueueId] = useState(null);
   const [deleteQueueId, setDeleteQueueId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -133,19 +133,28 @@ const AdminDashboard = () => {
     }
 
     try {
-      const { lat, lon } = (newQueue.venue ? await getCoordinates(newQueue.venue) : await getCurrLocation());
+      let lat, lon;
+      try {
+        ({ lat, lon } = newQueue.venue ?
+          await getCoordinates(newQueue.venue) :
+          await getCurrLocation());
+      } catch (error) {
+        throw new Error("Location required (enable GPS or enter venue)");
+      }
 
       const { data, error } = await supabase.rpc('create_queue', {
         p_name: newQueue.name,
+        p_desc: newQueue.desc,
+        p_loc_name: newQueue.venue || null,
         p_q_key: generateQKey(),
         p_latitude: Number(lat),
         p_longitude: Number(lon),
-        p_loc_name: newQueue.venue || null
       });
 
       if (error) throw error;
 
-      setUserQueues(prev => [data, ...prev]);
+      if (data) setUserQueues(prev => [data, ...prev]);
+      else fetchUserQueues();
       setActiveTab('manage');
       setNewQueue({ name: '', venue: '' });
     } catch (err) {
@@ -330,6 +339,19 @@ const AdminDashboard = () => {
                       value={newQueue.venue}
                       onChange={(e) => setNewQueue({ ...newQueue, venue: e.target.value })}
                       placeholder="Enter venue address (defaults to your location)"
+                      className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:ring-2 focus:ring-(--ring)" />
+                  </div>
+
+                  <div>
+                    <label htmlFor='desc' className="block text-sm font-medium mb-2 text-(--foreground)">
+                      Description (optional)
+                    </label>
+
+                    <input
+                      id='desc'
+                      value={newQueue.desc}
+                      onChange={(e) => setNewQueue({ ...newQueue, desc: e.target.value })}
+                      placeholder="Enter description here"
                       className="w-full px-4 py-2 rounded-md bg-(--background) text-(--foreground) border border-(--input) focus:ring-2 focus:ring-(--ring)" />
                   </div>
 

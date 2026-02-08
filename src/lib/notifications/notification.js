@@ -18,8 +18,8 @@ export async function sendNotification(title, body) {
 
   reg.showNotification(title, {
     body,
-    icon: '/favicon.ico',
-    badge: '/favicon.ico',
+    icon: '/icon.svg',
+    badge: '/icon.svg',
     vibrate: [200, 100, 200],
   });
 }
