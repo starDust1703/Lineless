@@ -149,7 +149,19 @@ const Dashboard = () => {
 
       const { data, error } = await supabase
         .from('queue_members')
-        .select('*, queues(name, population, live, description, latitude, longitude, loc_name), profiles(name)')
+        .select(`*,
+                queues(
+                  name,
+                  population,
+                  live,
+                  description,
+                  latitude,
+                  longitude,
+                  loc_name,
+                  created_by,
+                  host:profiles(name)
+                )
+              `)
         .eq('user_id', User.id)
         .order('position', { ascending: true });
 
@@ -493,10 +505,10 @@ const Dashboard = () => {
                                   </div>
                                 )}
 
-                                {qm.profiles.name && (
+                                {qm.queues.host.name && (
                                   <div className="flex items-center gap-2 text-sm text-(--foreground)/90 mb-3">
                                     <User size={16} />
-                                    <span>Hosted by <span className="font-medium">{qm.profiles.name}</span></span>
+                                    <span>Hosted by <span className="font-medium">{qm.queues.host.name}</span></span>
                                   </div>
                                 )}
 
@@ -565,54 +577,45 @@ const Dashboard = () => {
                                 Your Position
                               </div>
                             </div>
-                            <div className="text-left sm:text-right sm:ml-auto">
-                              <Dropdown
-                                trigger={<button className="list-none p-2 rounded-full border border-(--border) bg-(--muted)/40 text-sm font-medium cursor-pointer select-none">
-                                  <MoreVertical />
-                                </button>}
-                                items={[
-                                  qm.position > 1 && {
-                                    label: <div className="flex items-center gap-2">
-                                      <BellPlus className="size-4" />
-                                      Notify
-                                    </div>,
-                                    onClick: () => {
-                                      setNotifyFor(qm.id);
-                                      setNotifyRank(qm.notify_rank || 1)
-                                    }
-                                  }, {
-                                    label: <Link
-                                      href={`https://www.google.com/maps/dir/?api=1&destination=${qm.queues.latitude},${qm.queues.longitude}`}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="flex items-center gap-2"
-                                    >
-                                      <MapPinned className="size-4" />
-                                      Directions
-                                    </Link>
-                                  },
-                                  {
-                                    label:
-                                      <div
-                                        onClick={() =>
-                                          toast.promise(
-                                            handleLeaveQueue(qm.id),
-                                            {
-                                              loading: "Quitting...",
-                                              success: () => `Exited ${qm.queues.name}`,
-                                              error: "Error",
-                                            }
-                                          )
-                                        }
-                                        className="flex items-center gap-2 text-(--destructive)"
-                                      >
-                                        <LogOut className='size-4' />
-                                        Quit
-                                      </div>
+                            <Dropdown
+                              trigger={<button className="list-none p-2 rounded-full border border-(--border) bg-(--muted)/40 text-sm font-medium cursor-pointer select-none">
+                                <MoreVertical />
+                              </button>}
+                              items={[
+                                (qm.position > 1 && {
+                                  label: <div className="flex items-center gap-2">
+                                    <BellPlus className="size-4" />
+                                    Notify
+                                  </div>,
+                                  onClick: () => {
+                                    setNotifyFor(qm.id);
+                                    setNotifyRank(qm.notify_rank || 1)
                                   }
-                                ]}
-                                styles={'bottom-10'} />
-                            </div>
+                                }), {
+                                  label: <div className='flex items-center gap-2'>
+                                    <MapPinned className="size-4" />
+                                    Directions
+                                  </div>,
+                                  onClick: () => window.open(`https://www.google.com/maps/dir/?api=1&destination=${qm.queues.latitude},${qm.queues.longitude}`, "_blank", "noopener,noreferrer")
+                                },
+                                {
+                                  label:
+                                    <div className="flex items-center gap-2 text-(--destructive)">
+                                      <LogOut className='size-4' />
+                                      Quit
+                                    </div>,
+                                  onClick: () =>
+                                    toast.promise(
+                                      handleLeaveQueue(qm.id),
+                                      {
+                                        loading: "Quitting...",
+                                        success: () => `Exited ${qm.queues.name}`,
+                                        error: "Error",
+                                      }
+                                    )
+                                }
+                              ]}
+                              styles={'bottom-10'} />
                           </div>
 
                           <Modal

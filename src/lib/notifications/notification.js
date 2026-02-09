@@ -19,7 +19,7 @@ export async function sendNotification(title, body) {
   reg.showNotification(title, {
     body,
     icon: '/icon.svg',
-    badge: '/icon.svg',
+    badge: '/icon.png',
     vibrate: [200, 100, 200],
   });
 }

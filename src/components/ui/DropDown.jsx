@@ -23,8 +23,10 @@ export default function Dropdown({ trigger, items, styles }) {
 
       {open && (
         <div className={`absolute ${styles} right-0 mt-2 w-44 rounded-xl bg-(--background) backdrop-blur-xl shadow-lg border text-sm flex flex-col gap-1 p-1 border-(--border)`}>
-          {items.map((item, i) => (
-            <button
+          {items.map((item, i) => 
+            {
+              if (!item) return;
+              return <button
               key={i}
               onClick={() => {
                 item.onClick?.();
@@ -33,8 +35,8 @@ export default function Dropdown({ trigger, items, styles }) {
               className="w-full px-4 py-2 text-left cursor-pointer hover:bg-(--muted)/70 rounded-lg relative flex select-none items-center gap-2 text-sm transition-colors"
             >
               {item.label}
-            </button>
-          ))}
+            </button>}
+          )}
         </div>
       )}
     </div>
