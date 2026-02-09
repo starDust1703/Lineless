@@ -14,6 +14,8 @@ export default function LoginForm() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (isLoading) return;
+
     setIsLoading(true);
     setError(null);
 
@@ -26,7 +28,6 @@ export default function LoginForm() {
       router.replace("/dashboard");
     } catch (error) {
       setError(error instanceof Error ? error.message : "An error occurred");
-    } finally {
       setIsLoading(false);
     }
   };

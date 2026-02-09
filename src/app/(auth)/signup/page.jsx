@@ -17,6 +17,8 @@ export default function SignUp() {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
+    if (isLoading) return;
+
     setIsLoading(true);
     setError(null);
 
@@ -35,17 +37,16 @@ export default function SignUp() {
         },
       });
       if (error) throw error;
-      router.push("/dashboard");
-    } catch (error) {
-      setError(error ? error.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
       const { data: { user } } = await supabase.auth.getUser();
 
       await supabase.from('profiles').insert({
         id: user.id,
         name,
       });
+      router.push("/dashboard");
+    } catch (error) {
+      setError(error ? error.message : "An error occurred");
+      setIsLoading(false);
     }
   };
 

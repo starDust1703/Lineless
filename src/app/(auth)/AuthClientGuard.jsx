@@ -1,30 +1,18 @@
-"use client"
-import { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+"use client";
+import { useEffect, useState } from "react";
 import { createClient } from "../../lib/supabase/client";
 
-export default function AuthClientGuard () {
-  const router = useRouter();
-  const supabase = createClient();
-  const hasCheckedRef = useRef(false);
+export default function AuthClientGuard() {
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (hasCheckedRef.current) return;
-    hasCheckedRef.current = true;
+    const supabase = createClient();
 
-    const checkUser = async () => {
-      try {
-        const { data } = await supabase.auth.getSession();
-        if (data?.session?.user) router.replace("/dashboard");
-      } catch (err) {
-        if (err?.name !== "AuthApiError") {
-          console.error(err);
-        }
-      }
-    }
-
-    checkUser();
+    supabase.auth.getSession().finally(() => {
+      setReady(true);
+    });
   }, []);
 
+  if (!ready) return null;
   return null;
 }
