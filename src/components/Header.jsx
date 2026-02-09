@@ -50,7 +50,7 @@ export default function Header() {
         </nav>
         <button
           type="button"
-          className="inline-flex items-center justify-center rounded-md border border-(--border) p-2 text-(--foreground) transition hover:bg-(--muted) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--border) md:hidden"
+          className="inline-flex items-center justify-center rounded-md border border-(--border) p-2 text-(--foreground) transition hover:bg-(--muted) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--border) sm:hidden"
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
           aria-controls="primary-nav"

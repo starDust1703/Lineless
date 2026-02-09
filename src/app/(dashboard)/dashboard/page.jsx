@@ -42,13 +42,13 @@ const Dashboard = () => {
           event: '*',
           schema: 'public',
           table: 'queue_members',
+          filter: `user_id=eq.${user.id}`
         },
         (payload) => {
           fetchUserQueues(user);
-          if (payload.new.position <= payload.new.notify_rank && !payload.new.is_notified) {
+          if ((payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') && payload.new.position <= payload.new.notify_rank && !payload.new.is_notified) {
             handleNotification(payload.new);
           }
-          fetchNearbyQueues();
         }
       ).on(
         'postgres_changes',
@@ -206,6 +206,43 @@ const Dashboard = () => {
 
       const { error } = await supabase.rpc('join_queue', { q_id: qId });
       if (error) throw error;
+
+      const { data: qm, error: qmErr } = await supabase
+        .from('queue_members')
+        .select(`*,
+        queues(
+          name,
+          population,
+          live,
+          description,
+          latitude,
+          longitude,
+          loc_name,
+          created_by,
+          host:profiles(name)
+        )
+      `)
+        .eq('queue_id', qId)
+        .eq('user_id', user.id)
+        .single();
+
+      if (!qmErr && qm) {
+        const loc = await getCurrLocation();
+
+        const shaped = {
+          ...qm,
+          distance: calculateDistance(
+            loc.latitude,
+            loc.longitude,
+            qm.queues.latitude,
+            qm.queues.longitude
+          ),
+        };
+
+        setUserQueues(prev =>
+          [...prev, shaped].sort((a, b) => a.position - b.position)
+        );
+      }
 
       setJoinQueueKey('');
       return queueName ?? "queue";
