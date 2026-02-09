@@ -62,7 +62,7 @@ export default function UserHeader({ user }) {
           href="/"
           className="text-xl font-semibold tracking-tight text-(--foreground) flex items-center gap-2"
         >
-        <img src={'/icon.svg'} className="size-8"/>
+          <img src={'/icon.svg'} className="size-8" />
           LineLess
         </Link>
 
@@ -86,14 +86,17 @@ export default function UserHeader({ user }) {
             >
               {name && name[0]?.toUpperCase()}
             </button>}
-            items={[
+            items={isAdmin ? [
               { label: name },
-              isAdmin && {
-                label: (pathname == '/dashboard') ? "Admin" : "Dashboard",
-                onClick: () => router.push(`${pathname == '/dashboard' ? '/admin' : '/dashboard'}`)
+              {
+                label: (pathname == '/dashboard') ? "Admin" : "Dashboard", onClick: () => router.push(`${pathname == '/dashboard' ? '/admin' : '/dashboard'}`)
+
               },
               { label: "Log out", onClick: handleLogout },
-            ]}
+            ] :
+              [{ label: name },
+              { label: "Log out", onClick: handleLogout },
+              ]}
           />
         </nav>
       </div>
