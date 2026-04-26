@@ -43,7 +43,7 @@ export default function SignUp() {
         id: user.id,
         name,
       });
-      router.push("/dashboard");
+      window.location.href = "/dashboard";
     } catch (error) {
       setError(error ? error.message : "An error occurred");
       setIsLoading(false);

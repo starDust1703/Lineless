@@ -25,7 +25,7 @@ export default function LoginForm() {
         password,
       });
       if (error) throw error;
-      router.replace("/dashboard");
+      window.location.href = "/dashboard";
     } catch (error) {
       setError(error instanceof Error ? error.message : "An error occurred");
       setIsLoading(false);

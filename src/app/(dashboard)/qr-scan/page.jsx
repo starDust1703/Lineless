@@ -2,12 +2,13 @@
 
 import { Html5Qrcode } from "html5-qrcode";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function QRScan() {
   const qrRef = useRef(null);
   const runningRef = useRef(true);
   const router = useRouter();
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     let isActive = true;
@@ -61,6 +62,7 @@ export default function QRScan() {
         if (err?.name === "AbortError") return;
         if (isActive) {
           console.error("QR scanner failed to start", err);
+          setError("Camera permission denied or camera not available. Please enable permissions in your browser settings.");
         }
       }
     };
@@ -85,8 +87,20 @@ export default function QRScan() {
   }, [router]);
 
   return (
-    <div className="fixed inset-0 bg-black flex justify-center">
-      <div id="reader" className="w-screen h-screen" />
+    <div className="fixed inset-0 bg-black flex justify-center items-center">
+      {error ? (
+        <div className="relative z-10 p-6 bg-zinc-900/90 border border-zinc-800 rounded-xl text-center max-w-sm mx-4 shadow-2xl">
+          <p className="text-zinc-200 mb-6">{error}</p>
+          <button 
+            onClick={() => router.back()} 
+            className="px-5 py-2.5 bg-white text-black font-medium rounded-lg hover:bg-zinc-200 transition active:scale-95"
+          >
+            Go Back
+          </button>
+        </div>
+      ) : (
+        <div id="reader" className="w-screen h-screen absolute inset-0" />
+      )}
     </div>
   );
 }

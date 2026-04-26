@@ -93,7 +93,7 @@ export default function UserHeader({ user }) {
                 onClick: () => router.push(`${pathname == '/dashboard' ? '/admin' : '/dashboard'}`)
               }),
               { label: "Log out", onClick: handleLogout },
-              ]}
+                ]}
           />
         </nav>
       </div>

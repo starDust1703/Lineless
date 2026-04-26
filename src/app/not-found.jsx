@@ -1,6 +1,11 @@
 import SplashCursor from "../components/ui/SplashCursor";
 import Link from "next/link";
 
+export const metadata = {
+  title: "404 Not Found | LineLess",
+  description: "This page doesn’t exist. It never did.",
+};
+
 export default function NotFound() {
   return (
     <main className="min-h-screen flex items-center justify-center">

@@ -66,7 +66,7 @@ const Dashboard = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user?.id]);
 
   const getCurrLocation = () => {
     if (location) return Promise.resolve(location);
@@ -239,9 +239,10 @@ const Dashboard = () => {
           ),
         };
 
-        setUserQueues(prev =>
-          [...prev, shaped].sort((a, b) => a.position - b.position)
-        );
+        setUserQueues(prev => {
+          if (prev.some(q => q.id === shaped.id)) return prev;
+          return [...prev, shaped].sort((a, b) => a.position - b.position);
+        });
       }
 
       setJoinQueueKey('');
@@ -663,8 +664,7 @@ const Dashboard = () => {
                                 <button
                                   type="button"
                                   onClick={() => {
-                                    setJoinQueue(null);
-                                    setJoinQueueKey("");
+                                    setNotifyFor(null);
                                   }}
                                   className="absolute top-3 right-3 p-1 rounded-md hover:bg-(--muted) transition"
                                 >

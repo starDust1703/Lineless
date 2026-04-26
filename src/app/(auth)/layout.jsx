@@ -3,7 +3,11 @@ import { createClient } from "../../lib/supabase/server";
 import { redirect } from "next/navigation";
 import Footer from "../../components/Footer";
 import ClickSpark from "../../components/ui/ClickSpark";
-import AuthClientGuard from "./AuthClientGuard";
+
+export const metadata = {
+  title: "Authenticate | LineLess",
+  description: "Sign up or log in to your LineLess account.",
+};
 
 export default async function AuthLayout({ children }) {
   const supabase = await createClient();
@@ -20,7 +24,6 @@ export default async function AuthLayout({ children }) {
       sparkCount={8}
       duration={400}
     >
-      <AuthClientGuard />
       <Header />
       {children}
       <Footer />

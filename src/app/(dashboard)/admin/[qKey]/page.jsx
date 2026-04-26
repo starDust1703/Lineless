@@ -71,7 +71,7 @@ export default function Queue() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user?.id]);
 
   const fetchQueueMembers = async (Queue) => {
     if (!Queue) return;
